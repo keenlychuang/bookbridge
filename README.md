@@ -2,7 +2,7 @@
 
 # Booklist Import Tool
 
-Welcome to the Booklist Import Tool repository, where the joy of reading meets the efficiency of technology. This project is born out of a personal need to organize an old booklist into a more dynamic, shareable, and insightful format. Leveraging the power of Notion and cutting-edge LLM APIs, this tool aims to transform traditional booklists into an interactive database that not only showcases what I've read and what's on my wishlist but also categorizes books by various attributes for better organization and sharing capabilities.
+Transform your old booklists into a dynamic Notion database with the Booklist Import Tool.  Organize, share, and rediscover your reading history with the help of cutting-edge language models.
 
 ## Background and Overview
 
