@@ -1,4 +1,4 @@
-# bookbridge
+# BookBridge - Booklist Import Tool
 
 # Booklist Import Tool
 
