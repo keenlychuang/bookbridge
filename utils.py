@@ -1,4 +1,6 @@
 import requests
+import json 
+import pickle 
 from typing import Literal, Optional, List
 from dotenv import load_dotenv
 

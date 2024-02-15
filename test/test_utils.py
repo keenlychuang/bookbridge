@@ -16,14 +16,12 @@ def test_book_initialization():
     assert book.rating == 4.5
     assert book.notes == "Sample notes"
 
-# Example structure for testing llm_api_call once implemented
 @pytest.mark.skip(reason="Not implemented yet")
 def test_llm_api_call():
     # Mock the API call or use a fixed response
     # assert llm_api_call("test prompt") == "expected result"
     pass
 
-# Example structure for testing parse_response once implemented
 @pytest.mark.skip(reason="Not implemented yet")
 def test_parse_response():
     # Use a fixed API response and test if parsing is correct
