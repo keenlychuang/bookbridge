@@ -1,13 +1,24 @@
 import requests
 import json 
-import pickle 
+import pickle
+import csv 
+import fitz
+from io import StringIO 
 from typing import Literal, Optional, List
 from dotenv import load_dotenv
 
 Genre = Literal['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
 
+emoji_prompt = "You will be provided with text, and your task is to translate it into a single emoji. Do not use any regular text. Use only one emoji, even when more would be more descriptive." 
+num_books = 10
+booklist_prompt = f"Create a booklist of {num_books} of the most popular books of all time. Include brief descriptions of the book and give each a rating on a scale of one to five. Only return the list itself, do not describe your process."
+processing_prompt = "You will be provided with a text that represents a booklist. Your task is to translate it into a csv format. Include fields for the title, author, whether or not it is completed, its rating, and a summary of the book. Do not add any information that is not in the booklist itself, and leave the fields blank if they do not exist."
+genre_prompt = "You will be provided with the title of a book. Your task is to respond with the genre that most closely matches it. Pick from the following list."
+author_prompt = "You will be provided with the title of a book. Your task is to respond with name of the author of the book. "
+blurb_prompt = "You will be provided with the title of a book. Your task is to respond with a brief description of the book. Keep your description to a couple of sentences at most. Include only the description, and do not mention the title or the author. "
+
 class Book:
-    def __init__(self, title: str, author: str = None, genre: Optional[Genre] = None, completed: bool = False, blurb: str = None, rating: float = None, notes: str = None):
+    def __init__(self, title: str, author: str = None, genre: Optional[Genre] = None, completed: bool = False, blurb: str = None, rating: float = None):
         """
         Initializes a new Book instance.
 
@@ -18,14 +29,16 @@ class Book:
         - completed (bool, optional): Flag indicating if the book has been read. Default is False.
         - blurb (str, optional): A short description or blurb of the book. Default is None.
         - rating (float, optional): The personal rating given to the book. Default is None.
-        - notes (str, optional): Additional notes or comments about the book. Default is None.
+        # - notes (str, optional): Additional notes or comments about the book. Default is None.
         """
+        assert title is not None, "Title cannot be None"
         self.title = title
         self.author = author
         self.genre = genre
+        self.blurb = blurb
         self.completed = completed
         self.rating = rating
-        self.notes = notes
+        # self.notes = notes
 
     def llm_autofill(self) -> str:
         """
@@ -50,6 +63,28 @@ class Book:
         NotImplementedError: Indicates the method hasn't been implemented yet.
         """
         raise NotImplementedError()
+
+
+# def csv_string_to_books(csv_string: str) -> List[Book]:
+#     csv_file_like_object = StringIO(csv_string)
+#     reader = csv.DictReader(csv_file_like_object)
+#     books = []
+    
+#     for row in reader:
+#         # Convert string values from CSV to appropriate data types
+#         title = row.get("title")
+#         author = row.get("author")
+#         genre_str = row.get("genre")
+#         genre = Genre[genre_str.upper().replace(" ", "_")] if genre_str else None
+#         completed = row.get("completed", "False").lower() in ("yes", "true", "1")
+#         blurb = row.get("blurb")
+#         rating = float(row.get("rating")) if row.get("rating") else None
+#         notes = row.get("notes")
+        
+#         book = Book(title, author, genre, completed, blurb, rating, notes)
+#         books.append(book)
+    
+#     return books
 
 def llm_api_call(prompt: str, max_tokens: int = 150, temperature: float = 0.7) -> str:
     """
@@ -113,7 +148,7 @@ def generate_processing_prompt(raw_booklist: str) -> str:
     """
     raise NotImplementedError()
 
-def txt_to_books() -> List[Book]:
+def string_to_books() -> List[Book]:
     """
     Processes a list of books in text format to create a list of Book instances.
 
@@ -125,11 +160,30 @@ def txt_to_books() -> List[Book]:
     """
     raise NotImplementedError()
 
-def generate_sample_booklist() -> None:
+def extract_text_from_pdf(pdf_path: str) -> str:
     """
-    Generates a sample text booklist using the language model.
+    Extracts and returns all text from a PDF file.
+
+    Parameters:
+    - pdf_path (str): The file path to the PDF from which text will be extracted.
+
+    Returns:
+    - str: All text extracted from the PDF.
+    """
+    text = ''
+    with fitz.open(pdf_path) as doc:
+        for page in doc:
+            text += page.get_text()
+    return text
+
+def generate_sample_booklist(num_books:int, path = "data/test/book_titles/gpt4_titles.txt") -> str:
+    """
+    Placeholder function to generate return a sample booklist, pulled from a list of books.
+
+    Parameters:
+    - num_books (int): Number of books to include in the sample list.
 
     Raises:
-    NotImplementedError: Indicates the function hasn't been implemented yet.
+    - NotImplementedError: Functionality not yet implemented.
     """
     raise NotImplementedError()
