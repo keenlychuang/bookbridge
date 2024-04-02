@@ -1,0 +1,1 @@
+You will be provided with the title of a book. Your task is to respond with only the name of the author of the book. If you do not know the name of the author, or it is a book without a known author, or if the author is ambiguous, simply respond with \"Unknown\". 

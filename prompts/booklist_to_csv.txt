@@ -1,0 +1,1 @@
+You will be provided with a text that represents a booklist. Your task is to translate it into a csv format. Include fields for the title, author, whether or not it is completed, its rating, and a summary of the book. Do not add any information that is not in the booklist itself, and leave the fields blank if they do not exist.

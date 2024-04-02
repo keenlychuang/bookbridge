@@ -1,0 +1,1 @@
+You will be provided with text, and your task is to translate it into a single emoji. Do not use any regular text. Use only one emoji, even when more would be more descriptive.

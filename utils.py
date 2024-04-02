@@ -1,6 +1,7 @@
 import requests
 import json 
 import pickle
+from openai import OpenAI
 import csv 
 import fitz
 from io import StringIO 
@@ -8,14 +9,25 @@ from typing import Literal, Optional, List
 from dotenv import load_dotenv
 
 Genre = Literal['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
-
-emoji_prompt = "You will be provided with text, and your task is to translate it into a single emoji. Do not use any regular text. Use only one emoji, even when more would be more descriptive." 
-num_books = 10
-booklist_prompt = f"Create a booklist of {num_books} of the most popular books of all time. Include brief descriptions of the book and give each a rating on a scale of one to five. Only return the list itself, do not describe your process."
-processing_prompt = "You will be provided with a text that represents a booklist. Your task is to translate it into a csv format. Include fields for the title, author, whether or not it is completed, its rating, and a summary of the book. Do not add any information that is not in the booklist itself, and leave the fields blank if they do not exist."
-genre_prompt = "You will be provided with the title of a book. Your task is to respond with the genre that most closely matches it. Pick from the following list."
-author_prompt = "You will be provided with the title of a book. Your task is to respond with name of the author of the book. "
-blurb_prompt = "You will be provided with the title of a book. Your task is to respond with a brief description of the book. Keep your description to a couple of sentences at most. Include only the description, and do not mention the title or the author. "
+valid_genres = ['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
+valid_genres_string = str(valid_genres)
+with open('prompts/request_emoji.txt', 'r') as file:  # 'r' for read mode
+    emoji_prompt = file.read()
+with open('prompts/request_booklist.txt','r') as file: 
+    booklist_prompt = file.read() 
+with open('prompts/booklist_to_csv.txt', 'r') as file: 
+    processing_prompt = file.read() 
+with open('prompts/infer_genre.txt', 'r') as file:
+    genre_prompt = file.read() 
+with open('prompts/infer_author.txt', 'r') as file:
+    author_prompt = file.read() 
+with open('prompts/infer_blurb.txt', 'r') as file:
+    genre_prompt = file.read() 
+# booklist_prompt = "Create a booklist of 10 of the most popular books of all time. Include brief descriptions of the book and give each a rating on a scale of one to five. Only return the list itself, do not describe your process."
+# processing_prompt = "You will be provided with a text that represents a booklist. Your task is to translate it into a csv format. Include fields for the title, author, whether or not it is completed, its rating, and a summary of the book. Do not add any information that is not in the booklist itself, and leave the fields blank if they do not exist."
+# genre_prompt = "You will be provided with the title of a book. Your task is to respond with the genre that most closely matches it. Pick from the following list."
+# author_prompt = "You will be provided with the title of a book. Your task is to respond with only the name of the author of the book. If you do not know the name of the author, or it is a book without a known author, or if the author is ambiguous, simply respond with \"Unknown\". "
+# blurb_prompt = "You will be provided with the title of a book. Your task is to respond with a brief description of the book. Keep your description to a couple of sentences at most. Include only the description, and do not mention the title or the author. If you don't know the book, respond with \"A summary cannot be generated for this book title.\""
 
 class Book:
     def __init__(self, title: str, author: str = None, genre: Optional[Genre] = None, completed: bool = False, blurb: str = None, rating: float = None):
@@ -50,7 +62,27 @@ class Book:
         Raises:
         NotImplementedError: Indicates the method hasn't been implemented yet.
         """
-        raise NotImplementedError()
+        authored, genred, blurbed = False, False, False
+        #fill author 
+        if self.author is None: 
+            prompt = author_prompt + f"\n\n{self.title}"
+            author_string = llm_api_call(prompt=prompt)
+            self.author = author_string 
+            print("added author")
+        #fill genre 
+        if self.genre is None: 
+            prompt = genre_prompt + f"\n{valid_genres_string}\n\n{self.title}"
+            genre_string = llm_api_call(prompt=prompt)
+            assert genre_string in valid_genres
+            self.genre = genre_string
+            print("added genre")
+        #fill blurb 
+        if self.blurb is None: 
+            prompt = blurb_prompt + f"\n\n{self.title}"
+            blurb_string =llm_api_call(prompt=prompt)
+            self.blurb = blurb_string
+            print('added blurb')
+
 
     def __str__(self) -> str:
         """
@@ -59,34 +91,18 @@ class Book:
         Returns:
         str: A string detailing the book's title, author, and other attributes.
 
-        Raises:
-        NotImplementedError: Indicates the method hasn't been implemented yet.
         """
-        raise NotImplementedError()
+        completed_str = "Yes" if self.completed else "No"
+        return (
+            f"Title: {self.title}\n"
+            f"    Author: {self.author or 'N/A'}\n"
+            f"    Genre: {self.genre or 'N/A'}\n"
+            f"    Completed: {completed_str}\n"
+            f"    Blurb: {self.blurb or 'N/A'}\n"
+            f"    Rating: {self.rating or 'N/A'}\n"
+        )
 
-
-# def csv_string_to_books(csv_string: str) -> List[Book]:
-#     csv_file_like_object = StringIO(csv_string)
-#     reader = csv.DictReader(csv_file_like_object)
-#     books = []
-    
-#     for row in reader:
-#         # Convert string values from CSV to appropriate data types
-#         title = row.get("title")
-#         author = row.get("author")
-#         genre_str = row.get("genre")
-#         genre = Genre[genre_str.upper().replace(" ", "_")] if genre_str else None
-#         completed = row.get("completed", "False").lower() in ("yes", "true", "1")
-#         blurb = row.get("blurb")
-#         rating = float(row.get("rating")) if row.get("rating") else None
-#         notes = row.get("notes")
-        
-#         book = Book(title, author, genre, completed, blurb, rating, notes)
-#         books.append(book)
-    
-#     return books
-
-def llm_api_call(prompt: str, max_tokens: int = 150, temperature: float = 0.7) -> str:
+def llm_api_call(prompt: str, max_tokens: int = 150, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = "gpt-4-0125-preview") -> str:
     """
     Calls the GPT-4 API using a provided text prompt to generate text.
 
@@ -101,14 +117,26 @@ def llm_api_call(prompt: str, max_tokens: int = 150, temperature: float = 0.7) -
     Raises:
     NotImplementedError: Indicates the function hasn't been implemented yet.
     """
-    raise NotImplementedError()
+    load_dotenv() 
+    client = OpenAI() 
+    gpt_role_prompt = "You are an AI assistant that can help with a variety of tasks." 
+    gpt_user_prompt = prompt
+    combined_prompt=[{"role": "assistant", "content": gpt_role_prompt}, {"role": "user", "content": gpt_user_prompt}]
+    response = client.chat.completions.create(
+        model=model,
+        messages = combined_prompt,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        frequency_penalty=frequency_penalty)
+    string_response = response.choices[0].message.content
+    return string_response
 
 def parse_response(response_text: str) -> List[Book]:
     """
     Parses the response text from an API call into a list of Book instances.
 
     Parameters:
-    - response_text (str): The raw response text from an API call.
+    - response_text (str): The raw response text from an API call, assunming it is in a csv format
 
     Returns:
     List[Book]: A list of Book instances parsed from the response.
@@ -116,22 +144,17 @@ def parse_response(response_text: str) -> List[Book]:
     Raises:
     NotImplementedError: Indicates the function hasn't been implemented yet.
     """
-    raise NotImplementedError()
+    reader = csv.reader(response_text.splitlines())  # Split CSV into rows
+    books = []
+    for row in reader:
+        title, author, genre, completed, blurb, rating = row  # Unpacking row values
 
-def parse_booklist(path_to_document: str) -> str:
-    """
-    Parses a PDF document containing a booklist into a string format suitable for processing.
-
-    Parameters:
-    - path_to_document (str): The file path to the PDF document.
-
-    Returns:
-    str: The raw text extracted from the PDF document.
-
-    Raises:
-    NotImplementedError: Indicates the function hasn't been implemented yet.
-    """
-    raise NotImplementedError()
+        # Convert 'completed' to boolean, 'rating' to float if present
+        completed = completed == "True"
+        rating = float(rating) if rating else None  
+        book = Book(title, author, genre, completed, blurb, rating) 
+        books.append(book)
+    return books
 
 def generate_processing_prompt(raw_booklist: str) -> str:
     """
@@ -148,7 +171,7 @@ def generate_processing_prompt(raw_booklist: str) -> str:
     """
     raise NotImplementedError()
 
-def string_to_books() -> List[Book]:
+def string_to_books(csv_string:str) -> List[Book]:
     """
     Processes a list of books in text format to create a list of Book instances.
 
@@ -158,7 +181,7 @@ def string_to_books() -> List[Book]:
     Raises:
     NotImplementedError: Indicates the function hasn't been implemented yet.
     """
-    raise NotImplementedError()
+    raise NotImplementedError("NOT YET IMPLEMENTED")
 
 def extract_text_from_pdf(pdf_path: str) -> str:
     """
