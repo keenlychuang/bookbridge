@@ -1,1 +1,7 @@
-You will be provided with a text that represents a booklist. Your task is to translate it into a csv format. Include fields for the title, author, whether or not it is completed, its rating, and a summary of the book. Do not add any information that is not in the booklist itself, and leave the fields blank if they do not exist.
+You will be provided with a text that represents a booklist. Your task is to translate it into a csv format. Include fields for the title, author, whether or not it has been read or is completed, its rating, and a summary or blurb of the book. Do not add any information that is not in the booklist itself, and leave the fields blank if they do not exist.
+
+The heading for the csv should be the following: 
+title,author,completed,rating,summary
+
+An example entry would look like this: 
+The Fountainhead,Ayn Rand,True,,novel about an individualistic young architect's struggle against traditional standards and his pursuit of creative freedom
