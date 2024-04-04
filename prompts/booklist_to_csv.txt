@@ -1,7 +1,27 @@
-You will be provided with a text that represents a booklist. Your task is to translate it into a csv format. Include fields for the title, author, whether or not it has been read or is completed, its rating, and a summary or blurb of the book. Do not add any information that is not in the booklist itself, and leave the fields blank if they do not exist.
+You will be tasked with converting a provided booklist into CSV format. The CSV should include columns for the title, author, completion status (read or not read), rating (if available), and a brief summary or blurb of the book. Follow these guidelines:
 
-The heading for the csv should be the following: 
-title,author,completed,rating,summary
+1. Begin your CSV with a header row as follows: title,author,completed,rating,summary
 
-An example entry would look like this: 
-The Fountainhead,Ayn Rand,True,,novel about an individualistic young architect's struggle against traditional standards and his pursuit of creative freedom
+2. For each book:
+   - Include the title, author's name, and completion status as either `True` or `False`. Assume `False` if the completion status is not explicitly stated.
+   - Leave the rating field empty if no rating is provided. If a rating is provided, ensure it is formatted as a numerical value.
+   - Include a summary only if provided in the booklist. Leave this field empty otherwise.
+
+3. If a field contains commas, newline characters, or double quotes, enclose the entire field in double quotes. If a field contains double quotes, escape these by doubling them (e.g., a quote `"` becomes two quotes `""`).
+
+4. Ensure all rows, including the header, have the same number of fields, using commas to delimit fields. If a field is empty, include the comma but leave the space between commas empty (e.g., `,,` for two consecutive empty fields).
+
+5. Do not infer or add any information not explicitly provided in the booklist. This includes not attempting to fill in missing ratings or summaries.
+
+6. Each entry in the CSV should represent one book, with fields separated by commas and each book on a new line.
+
+Example entry:
+The Fountainhead,Ayn Rand,True,,A novel about an individualistic young architect's struggle against traditional standards and his pursuit of creative freedom
+
+Another example:
+1984,George Orwell,False,5,"A dystopian novel that explores the dangers of totalitarianism."
+
+Your output should be the text of the CSV file, starting with the header and ending with the last row of book data.
+Make sure not to include the opening or closing ``` characters. 
+
+Here is the booklist: 

@@ -30,10 +30,10 @@ def test_llm_api_call():
     print(f"llm api call produced the following test response:\n{response}")
     assert isinstance(response, str)
 
-def test_parse_response():
+def test_parse_csv_response():
     with open('data/test/synthetic_booklists/sample.csv', 'r') as file:
         output = file.read()
-    books = parse_response(output)
+    books = parse_csv_response(output)
     for book in books:
         assert isinstance(book, Book)
 
@@ -43,11 +43,26 @@ def test_parse_response():
 #     print("generated the following processing prompt: ")
 #     print(prompt)
 
-def test_string_to_books():
+def test_bookstring_to_csv(): 
+    with open("data/test/synthetic_booklists/sample_booklist.txt", 'r') as file: 
+        string = file.read() 
+    csv = bookstring_to_csv(string)
+    print(csv)
+    assert is_valid_csv(csv)
+
+def test_extract_text_from_pdf():
     path = "data/test/synthetic_booklists/test_booklist_5.pdf"
     string = extract_text_from_pdf(path)
-    books = parse_response(string)
+    print("Does this look like a good booklist?\n----------")
+    print(string)
+    print("----------")
+
+#stil failing
+def test_pdf_to_bookslist():
+    path = "data/test/synthetic_booklists/test_booklist_5.pdf"
+    books = pdf_to_booklist(path)
     assert len(books) == 5
+
 
 # def test_generate_sample_booklist():
 #     num_books = 10 
@@ -63,13 +78,13 @@ def test_string_to_books():
 #     assert booklist_string == ""
 
 def test_autofill():
-    book = Book("The Three Body Problem")
+    book = Book("Animal Farm")
     book.llm_autofill()
 
     # assert proper formatting on first three fields 
-    assert book.title == "The Three Body Problem"
-    assert book.author == "Liu Cixin"
-    assert book.genre == "science fiction"
+    assert book.title == "Animal Farm"
+    assert book.author == "George Orwell"
+    assert book.genre == "fiction"
     assert book.completed is not None
 
     # doesn't matter which blurb, should not complete other fields

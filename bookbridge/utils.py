@@ -65,20 +65,17 @@ class Book:
             prompt = author_prompt + f"\n\n{self.title}"
             author_string = llm_api_call(prompt=prompt)
             self.author = author_string 
-            print("added author")
         #fill genre 
         if self.genre is None: 
             prompt = genre_prompt + f"\n{valid_genres_string}\n\n{self.title}"
             genre_string = llm_api_call(prompt=prompt)
             assert genre_string in valid_genres
             self.genre = genre_string
-            print("added genre")
         #fill blurb 
         if self.blurb is None: 
             prompt = blurb_prompt + f"\n\n{self.title}"
             blurb_string =llm_api_call(prompt=prompt)
             self.blurb = blurb_string
-            print('added blurb')
 
 
     def __str__(self) -> str:
@@ -99,7 +96,7 @@ class Book:
             f"    Rating: {self.rating or 'N/A'}\n"
         )
 
-def llm_api_call(prompt: str, max_tokens: int = 150, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = "gpt-4-0125-preview") -> str:
+def llm_api_call(prompt: str, max_tokens: int = 1000, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = "gpt-4-0125-preview") -> str:
     """
     Calls the GPT-4 API using a provided text prompt to generate text.
 
@@ -128,7 +125,44 @@ def llm_api_call(prompt: str, max_tokens: int = 150, temperature: float = 0.7, f
     string_response = response.choices[0].message.content
     return string_response
 
-def parse_response(response_text: str, autofill:bool = True) -> List[Book]:
+def bookstring_to_csv(bookstring:str)-> str: 
+    """
+    Parses the raw string text from a booklist into a csv format
+    """
+    prompt_full = processing_prompt + bookstring
+    csv_formatted = llm_api_call(prompt_full)
+    return csv_formatted
+
+def is_valid_csv(csv_string):
+    rows = csv_string.strip().split("\n")
+    
+    # Determine the number of columns from the header row
+    num_columns = len(rows[0].split(","))
+    
+    for row in rows:
+        # Basic parsing of CSV row, not handling special cases like quotes
+        fields = row.split(",")
+        
+        # Check if the number of fields in this row matches the header
+        if len(fields) != num_columns:
+            return False
+    
+    return True
+
+def pdf_to_booklist(path:str): 
+    #pdf to string
+    string = extract_text_from_pdf(path)
+    #string to csv 
+    csv = bookstring_to_csv(string)
+    try:
+        assert is_valid_csv(csv)
+    except:
+        raise ValueError("Invalid CSV")
+        print(csv)
+    #parse_response
+    return parse_csv_response(csv)
+
+def parse_csv_response(response_text: str, autofill:bool = True) -> List[Book]:
     """
     Parses the response text from an API call into a list of Book instances.
 
