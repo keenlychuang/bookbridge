@@ -3,7 +3,6 @@ import pytest
 from typing import Literal, Optional 
 from bookbridge.utils import *
 
-# Test the Book class initialization
 def test_book_initialization():
     book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5)
     assert book.title == "Sample Title"
@@ -12,6 +11,7 @@ def test_book_initialization():
     assert book.completed is True
     assert book.blurb == "Sample blurb"
     assert book.rating == 4.5
+    return book 
     # assert book.notes == "Sample notes"
 
 def test_book_autofill(): 
@@ -37,12 +37,6 @@ def test_parse_csv_response():
     for book in books:
         assert isinstance(book, Book)
 
-# def test_generate_processing_prompt(): 
-#     string = extract_text_from_pdf("data/test/synthetic_booklists/test_booklist_5.pdf")
-#     prompt = generate_processing_prompt(string)
-#     print("generated the following processing prompt: ")
-#     print(prompt)
-
 def test_bookstring_to_csv(): 
     with open("data/test/synthetic_booklists/sample_booklist.txt", 'r') as file: 
         string = file.read() 
@@ -57,25 +51,10 @@ def test_extract_text_from_pdf():
     print(string)
     print("----------")
 
-#stil failing
 def test_pdf_to_bookslist():
     path = "data/test/synthetic_booklists/test_booklist_5.pdf"
     books = pdf_to_booklist(path)
     assert len(books) == 5
-
-
-# def test_generate_sample_booklist():
-#     num_books = 10 
-#     path = "data/test/book_titles/reddit_titles.txt"
-#     booklist_string = generate_sample_booklist(num_books, path=path)
-    
-#     # assert that the string is not empty
-#     assert booklist_string != ""
-
-#     num_books = 0 
-#     booklist_string = generate_sample_booklist(num_books, path=path)
-#     # assert that the string is empty
-#     assert booklist_string == ""
 
 def test_autofill():
     book = Book("Animal Farm")
@@ -95,6 +74,43 @@ def test_autofill():
 def test_pretty_print():
     book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5)
     print(book)
+
+def test_python_to_notion_database(): 
+    # load example python database 
+    # create database 
+    # add booklist pages 
+    # return id 
+    # print out entries 
+    raise NotImplementedError
+
+def test_infer_emoji(): 
+    # load example book 
+    # infer emoji 
+    # assert emoji is acceptable by notion, ie, unicode 
+    raise NotImplementedError 
+
+def test_create_booklist_database():
+    # create booklsit database 
+    # query database 
+    # assert if database exists 
+    raise NotImplementedError 
+
+def test_add_booklist_page(): 
+    # assume we have a valid booklist database ID already with properly formatted properties 
+    # check number of pages before 
+    # add page 
+    # check number of pages after, assert we added a page 
+    raise NotImplementedError
+
+def test_sample_book(): 
+    # call function
+    # check if its a proper book object 
+    raise NotImplementederror 
+
+def test_sample_booklist(): 
+    # call function
+    # check if each book was autofilled, and each book is indeed a Book 
+    raise NotImplementedError
 
 if __name__ == "__main__":
     pytest.main()

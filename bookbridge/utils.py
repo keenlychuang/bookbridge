@@ -269,15 +269,26 @@ def add_booklist_page(book: Book, database_id: str):
     """
     raise NotImplementedError 
 
-
-def generate_sample_booklist(num_books:int, path = "data/test/book_titles/gpt4_titles.txt") -> str:
+# TODO: untested 
+def sample_book():
     """
-    Placeholder function to generate return a sample booklist, pulled from a list of books.
+    Returns a sample Book object with non-emoji parameters autofilled 
+    """ 
+    book = Book("Crime and Punishment")
+    book.autofill() 
+    return book 
 
-    Parameters:
-    - num_books (int): Number of books to include in the sample list.
-
-    Raises:
-    - NotImplementedError: Functionality not yet implemented.
+# TODO: untested 
+def sample_booklist(): 
     """
-    raise NotImplementedError()
+    Returns a sample booklist, a python List of Book objects with their non-emoji parameters autofilled 
+    """
+    booklist = [Book("Crime and Punishment"), 
+                Book("The Cat in the Hat"), 
+                Book("Eragon"),
+                Book("Dune"),
+                Book("Never Finished")
+                ] 
+    for book in booklist:
+        book.autofill()
+    return booklist 
