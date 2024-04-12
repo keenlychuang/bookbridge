@@ -3,6 +3,7 @@ import pytest
 from typing import Literal, Optional 
 from bookbridge.utils import *
 
+@pytest.mark.doc
 def test_book_initialization():
     book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5)
     assert book.title == "Sample Title"
@@ -14,6 +15,7 @@ def test_book_initialization():
     return book 
     # assert book.notes == "Sample notes"
 
+@pytest.mark.doc
 def test_book_autofill(): 
     book = Book("Crime and Punishment")
     expected_author = "Fyodor Dostoevsky"
@@ -24,12 +26,14 @@ def test_book_autofill():
     assert isinstance(book.blurb, str)
     print(book)
 
+@pytest.mark.doc
 def test_llm_api_call():
     prompt = "Your task to return a critique of surveillance captialism and its impact on society."
     response = llm_api_call(prompt)
     print(f"llm api call produced the following test response:\n{response}")
     assert isinstance(response, str)
 
+@pytest.mark.doc
 def test_parse_csv_response():
     with open('data/test/synthetic_booklists/sample.csv', 'r') as file:
         output = file.read()
@@ -37,6 +41,7 @@ def test_parse_csv_response():
     for book in books:
         assert isinstance(book, Book)
 
+@pytest.mark.doc
 def test_bookstring_to_csv(): 
     with open("data/test/synthetic_booklists/sample_booklist.txt", 'r') as file: 
         string = file.read() 
@@ -44,6 +49,7 @@ def test_bookstring_to_csv():
     print(csv)
     assert is_valid_csv(csv)
 
+@pytest.mark.doc
 def test_extract_text_from_pdf():
     path = "data/test/synthetic_booklists/test_booklist_5.pdf"
     string = extract_text_from_pdf(path)
@@ -51,11 +57,13 @@ def test_extract_text_from_pdf():
     print(string)
     print("----------")
 
+@pytest.mark.doc
 def test_pdf_to_bookslist():
     path = "data/test/synthetic_booklists/test_booklist_5.pdf"
     books = pdf_to_booklist(path)
     assert len(books) == 5
 
+@pytest.mark.doc
 def test_autofill():
     book = Book("Animal Farm")
     book.llm_autofill()
@@ -71,10 +79,12 @@ def test_autofill():
     assert book.rating is None              
     # assert book.notes is None
 
+@pytest.mark.doc
 def test_pretty_print():
     book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5)
     print(book)
 
+@pytest.mark.notion 
 def test_python_to_notion_database(): 
     # load example python database 
     # create database 
@@ -83,18 +93,21 @@ def test_python_to_notion_database():
     # print out entries 
     raise NotImplementedError
 
+@pytest.mark.notion 
 def test_infer_emoji(): 
     # load example book 
     # infer emoji 
     # assert emoji is acceptable by notion, ie, unicode 
     raise NotImplementedError 
 
+@pytest.mark.notion
 def test_create_booklist_database():
     # create booklsit database 
     # query database 
     # assert if database exists 
     raise NotImplementedError 
 
+@pytest.mark.notion 
 def test_add_booklist_page(): 
     # assume we have a valid booklist database ID already with properly formatted properties 
     # check number of pages before 
@@ -102,11 +115,13 @@ def test_add_booklist_page():
     # check number of pages after, assert we added a page 
     raise NotImplementedError
 
+@pytest.mark.notion
 def test_sample_book(): 
     # call function
     # check if its a proper book object 
-    raise NotImplementederror 
+    raise NotImplementedError 
 
+@pytest.mark.notion
 def test_sample_booklist(): 
     # call function
     # check if each book was autofilled, and each book is indeed a Book 
