@@ -47,7 +47,8 @@ class Book:
         self.blurb = blurb
         self.completed = completed
         self.rating = rating
-        # self.notes = notes
+        self.emoji = None 
+        self.notes = None
 
     def llm_autofill(self) -> str:
         """
@@ -212,6 +213,62 @@ def extract_text_from_pdf(pdf_path: str) -> str:
         for page in doc:
             text += page.get_text()
     return text
+
+# TODO: untesetd 
+def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page: str): 
+    """ 
+    Given a list of Books, creates a Notion Database with entries corresponding to each book.
+
+    Parameters: 
+    - notion_key (str): the api key for the Notion integration 
+    - booklist (List[Book]): A list of Books to transfer to Notion 
+    - parent_page (str): the id of the parent page where the book will be created 
+    
+    Returns: 
+    - database_id (str): the database id associated with the new Notion database 
+
+    """ 
+    raise NotImplementedError("Not Yet Finished")
+
+# TODO: untesetd 
+def infer_emoji(book: Book): 
+    """
+    Uses an LLM API call to infer an appropriate emoji representing the book
+
+    Parameters: 
+    - book (Book): The book to infer an emoji for 
+
+    Returns: 
+    - emoji (str):  A Unicode Emoji to represent the book 
+    """
+    raise NotImplementedError 
+
+# TODO: untesetd 
+def create_booklist_database(parent_page: str):
+    """
+    Creates a Notion database and returns the associated database id
+
+    Parameters: 
+    - parent_page (str): the ID of the parent page of the database, which can be another page, database, or workspace. 
+    
+    Returns:
+    - database_id (str): the ID of the created database
+    """
+    raise NotImplementedError
+
+# TODO: untesetd 
+def add_booklist_page(book: Book, database_id: str): 
+    """
+    Adds a row to the database representing the booklist in Notion, cooresponding to the supplied Book. 
+
+    Params: 
+    - book (Book): the book object representing the book to be added to the database 
+    - database_id (str): the id of the Notion database representing the booklist. 
+
+    Returns: None 
+    """
+    raise NotImplementedError 
+
 
 def generate_sample_booklist(num_books:int, path = "data/test/book_titles/gpt4_titles.txt") -> str:
     """
