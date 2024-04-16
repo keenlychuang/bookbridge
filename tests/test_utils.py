@@ -3,6 +3,9 @@ import pytest
 from typing import Literal, Optional 
 from bookbridge.utils import *
 
+load_dotenv() 
+test_parent_page_id = PARENT_TEST_PAGE
+
 @pytest.mark.doc
 def test_book_initialization():
     book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5)
@@ -86,26 +89,34 @@ def test_pretty_print():
 
 @pytest.mark.notion 
 def test_python_to_notion_database(): 
-    # load example python database 
-    # create database 
-    # add booklist pages 
-    # return id 
-    # print out entries 
+    # load example python booklist 
+    booklist = sample_booklist() 
+    notion_key = notion_key
+    parent_page = test_parent_page_id
+    # create database and return id 
+    id = python_to_notion_database(notion_key, booklist, parent_page)
+    # print out pages 
     raise NotImplementedError
 
 @pytest.mark.notion 
 def test_infer_emoji(): 
     # load example book 
+    book = sample_book() 
     # infer emoji 
+    emoji = infer_emoji(book)
     # assert emoji is acceptable by notion, ie, unicode 
-    raise NotImplementedError 
+    assert is_emoji(emoji)
 
 @pytest.mark.notion
 def test_create_booklist_database():
     # create booklsit database 
+    database_id = create_booklist_database(test_parent_page_id)
     # query database 
-    # assert if database exists 
-    raise NotImplementedError 
+    query_response = await notion.databases.query(
+        database_id=database_id
+    )
+    # print out page 
+    print(query_response)
 
 @pytest.mark.notion 
 def test_add_booklist_page(): 
@@ -115,17 +126,27 @@ def test_add_booklist_page():
     # check number of pages after, assert we added a page 
     raise NotImplementedError
 
-@pytest.mark.notion
+@pytest.mark.doc
 def test_sample_book(): 
     # call function
+    book = sample_book() 
     # check if its a proper book object 
-    raise NotImplementedError 
+    assert isinstance(book, Book)
 
-@pytest.mark.notion
+@pytest.mark.doc
 def test_sample_booklist(): 
     # call function
+    booklist = sample_booklist() 
     # check if each book was autofilled, and each book is indeed a Book 
-    raise NotImplementedError
+    for book in booklist: 
+        assert book.author is not None
+
+@pytest.mark.doc
+def test_is_emoji(): 
+    test_strings = ['\ud83d\ude00', '\ud83d\ude80', 'Hello, world!', '\ud83d\udc4d\ud83d\udc4e']
+    results = [is_emoji(candidate) for candidate in test_strings]
+    assert results == [True, True, False, True, True]
+
 
 if __name__ == "__main__":
     pytest.main()

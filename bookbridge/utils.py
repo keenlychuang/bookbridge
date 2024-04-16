@@ -8,8 +8,10 @@ import io
 from tqdm import tqdm
 from typing import Literal, Optional, List
 from dotenv import load_dotenv
+import unicodedata
 
-
+load_dotenv() 
+notion_key = NOTION_SECRET_KEY
 Genre = Literal['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
 valid_genres = ['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
 valid_genres_string = str(valid_genres)
@@ -231,7 +233,7 @@ def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page
     raise NotImplementedError("Not Yet Finished")
 
 # TODO: untesetd 
-def infer_emoji(book: Book): 
+def infer_emoji(book: Book) -> str: 
     """
     Uses an LLM API call to infer an appropriate emoji representing the book
 
@@ -244,7 +246,7 @@ def infer_emoji(book: Book):
     raise NotImplementedError 
 
 # TODO: untesetd 
-def create_booklist_database(parent_page: str):
+def create_booklist_database(parent_page: str) -> str:
     """
     Creates a Notion database and returns the associated database id
 
@@ -257,7 +259,7 @@ def create_booklist_database(parent_page: str):
     raise NotImplementedError
 
 # TODO: untesetd 
-def add_booklist_page(book: Book, database_id: str): 
+def add_booklist_page(book: Book, database_id: str) -> str: 
     """
     Adds a row to the database representing the booklist in Notion, cooresponding to the supplied Book. 
 
@@ -265,21 +267,20 @@ def add_booklist_page(book: Book, database_id: str):
     - book (Book): the book object representing the book to be added to the database 
     - database_id (str): the id of the Notion database representing the booklist. 
 
-    Returns: None 
+    Returns: 
+    - id (str): the id of the new booklist page in the database 
     """
     raise NotImplementedError 
 
-# TODO: untested 
-def sample_book():
+def sample_book() -> Book:
     """
     Returns a sample Book object with non-emoji parameters autofilled 
     """ 
     book = Book("Crime and Punishment")
-    book.autofill() 
+    book.llm_autofill() 
     return book 
 
-# TODO: untested 
-def sample_booklist(): 
+def sample_booklist() -> List: 
     """
     Returns a sample booklist, a python List of Book objects with their non-emoji parameters autofilled 
     """
@@ -290,5 +291,28 @@ def sample_booklist():
                 Book("Never Finished")
                 ] 
     for book in booklist:
-        book.autofill()
+        book.llm_autofill()
     return booklist 
+
+def is_emoji(s:str) -> bool:
+    """
+    Determines if the string s is a valid emoji in unicode 
+    """
+    emoji_ranges = [
+        ('\U0001F600', '\U0001F64F'),  # Emoticons
+        ('\U0001F300', '\U0001F5FF'),  # Miscellaneous Symbols and Pictographs
+        ('\U0001F680', '\U0001F6FF'),  # Transport and Map Symbols
+        ('\U0001F700', '\U0001F77F'),  # Alchemical Symbols
+        ('\U0001F780', '\U0001F7FF'),  # Geometric Shapes Extended
+        ('\U0001F800', '\U0001F8FF'),  # Supplemental Arrows-C
+        ('\U0001F900', '\U0001F9FF'),  # Supplemental Symbols and Pictographs
+        ('\U0001FA00', '\U0001FA6F'),  # Chess Symbols
+        ('\U0001FA70', '\U0001FAFF'),  # Symbols and Pictographs Extended-A
+        ('\U00002702', '\U000027B0'),  # Dingbats
+        ('\U000024C2', '\U0001F251')   # Enclosed characters
+    ]
+
+    def in_range(uchar):
+        return any(start <= uchar <= end for start, end in emoji_ranges)
+
+    return all(in_range) 
