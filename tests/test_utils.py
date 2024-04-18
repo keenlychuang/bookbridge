@@ -1,10 +1,13 @@
 import requests 
 import pytest
+import asyncio
+import os 
 from typing import Literal, Optional 
 from bookbridge.utils import *
+from notion_client import Client
 
 load_dotenv() 
-test_parent_page_id = PARENT_TEST_PAGE
+test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
 
 @pytest.mark.doc
 def test_book_initialization():
@@ -91,12 +94,18 @@ def test_pretty_print():
 def test_python_to_notion_database(): 
     # load example python booklist 
     booklist = sample_booklist() 
-    notion_key = notion_key
-    parent_page = test_parent_page_id
+    notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
+    parent_page = os.getenv("PARENT_TEST_PAGE")
+    #load up notion client 
+    notion = Client(auth=os.getenv('TEST_NOTION_SECRET_KEY'))
     # create database and return id 
     id = python_to_notion_database(notion_key, booklist, parent_page)
     # print out pages 
-    raise NotImplementedError
+    query_response = notion.databases.query(
+        database_id = id 
+    )
+    print(query_response['results'])
+    
 
 @pytest.mark.notion 
 def test_infer_emoji(): 
@@ -108,7 +117,7 @@ def test_infer_emoji():
     assert is_emoji(emoji)
 
 @pytest.mark.notion
-def test_create_booklist_database():
+async def test_create_booklist_database():
     # create booklsit database 
     database_id = create_booklist_database(test_parent_page_id)
     # query database 
@@ -120,11 +129,23 @@ def test_create_booklist_database():
 
 @pytest.mark.notion 
 def test_add_booklist_page(): 
+    book = sample_book() 
+    key = os.getenv('TEST_NOTION_SECRET_KEY')
+    notion = Client(auth=key)
     # assume we have a valid booklist database ID already with properly formatted properties 
+    test_db_id = os.getenv('TEST_DB_ID')
     # check number of pages before 
+    query_response = notion.databases.query(
+        database_id=os.getenv('TEST_DB_ID')
+    )
+    prev_len = len(query_response['results'])
     # add page 
+    add_booklist_page(book, test_db_id)
     # check number of pages after, assert we added a page 
-    raise NotImplementedError
+    query_response = notion.databases.query(
+        database_id=os.getenv('TEST_DB_ID')
+    )
+    assert len(query_response['results']) - 1 == prev_len
 
 @pytest.mark.doc
 def test_sample_book(): 

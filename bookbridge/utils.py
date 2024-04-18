@@ -5,13 +5,14 @@ from openai import OpenAI
 import csv 
 import fitz
 import io 
+import os 
 from tqdm import tqdm
 from typing import Literal, Optional, List
 from dotenv import load_dotenv
 import unicodedata
 
 load_dotenv() 
-notion_key = NOTION_SECRET_KEY
+notion_key = os.getenv('NOTION_SECRET_KEY')
 Genre = Literal['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
 valid_genres = ['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
 valid_genres_string = str(valid_genres)
@@ -49,6 +50,9 @@ class Book:
         self.blurb = blurb
         self.completed = completed
         self.rating = rating
+
+        #TODO Impelment Rec By 
+        self.rec_by = None 
         self.emoji = None 
         self.notes = None
 
@@ -248,7 +252,8 @@ def infer_emoji(book: Book) -> str:
 # TODO: untesetd 
 def create_booklist_database(parent_page: str) -> str:
     """
-    Creates a Notion database and returns the associated database id
+    Creates a Notion database and returns the associated database id. Include properties for 
+    Title, Author, Genre, Status, Rating and Rec By. Include blurb as a subpage. 
 
     Parameters: 
     - parent_page (str): the ID of the parent page of the database, which can be another page, database, or workspace. 
@@ -315,4 +320,4 @@ def is_emoji(s:str) -> bool:
     def in_range(uchar):
         return any(start <= uchar <= end for start, end in emoji_ranges)
 
-    return all(in_range) 
+    return all(in_range(s)) 
