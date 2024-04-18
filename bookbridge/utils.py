@@ -13,8 +13,14 @@ import unicodedata
 
 load_dotenv() 
 notion_key = os.getenv('NOTION_SECRET_KEY')
-Genre = Literal['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
-valid_genres = ['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
+# Genre = Literal['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
+# valid_genres = ['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
+valid_genres = [
+                'fiction', 'non-fiction', 'biography', 'mystery', 'fantasy', 'science-fiction',
+                'historical', 'romance', 'thriller', 'self-help', 'poetry', 'graphic-novel', 
+                'adventure', 'horror', 'true-crime', 'childrens', 'young-adult', 'classic-literature', 
+                'philosophy', 'anthology', 'memoir', 'short-story', 'historical-fiction', 
+]
 valid_genres_string = str(valid_genres)
 with open('prompts/request_emoji.txt', 'r') as file: 
     emoji_prompt = file.read()
@@ -247,9 +253,8 @@ def infer_emoji(book: Book) -> str:
     Returns: 
     - emoji (str):  A Unicode Emoji to represent the book 
     """
-    raise NotImplementedError 
+    
 
-# TODO: untesetd 
 def create_booklist_database(parent_page: str, notion_key:str) -> str:
     """
     Creates a Notion database and returns the associated database id. Include properties for 
@@ -264,11 +269,91 @@ def create_booklist_database(parent_page: str, notion_key:str) -> str:
     notion = Client(auth=notion_key)
     
     #create dict/json
-
+    parent = {"type": "page_id","page_id": page_id}
+    title = [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": "Test Database",
+                    },
+                },
+            ]
+    properties = {
+            "Title": {
+                "type": "title",
+                "title": {},
+            },
+            "Author": {
+                "type": "rich_text",
+                "rich_text": {},
+            },            
+            "Genre": {
+                "type": "select",
+                "select": {
+                    "options": [
+                        {"name": "Fantasy", "color": "blue"},
+                        {"name": "Sci-Fi", "color": "purple"},
+                        {"name": "Mystery", "color": "gray"},
+                        {"name": "Non-Fiction", "color": "brown"},
+                        # Add more genres as needed
+                    ]
+                }
+            },
+            "Status":{
+                "type": "select", 
+                "select": {
+                    "options" :[ 
+                        {
+                            "name": "Completed", 
+                            "color": "green"
+                        }, 
+                        {
+                            "name": "Not Started", 
+                            "color": "gray"
+                        },                         
+                        {
+                            "name": "In Progress", 
+                            "color": "orange"
+                        }, 
+                    ]
+                }
+            },
+            "Rating": {
+                "type": "select",
+                "select": {
+                    "options": [
+                        {"name": "⭐", "color": "yellow"},
+                        {"name": "⭐⭐", "color": "yellow"},
+                        {"name": "⭐⭐⭐", "color": "yellow"},
+                        {"name": "⭐⭐⭐⭐", "color": "yellow"},
+                        {"name": "⭐⭐⭐⭐⭐", "color": "yellow"},
+                        {"name": "Not Rated", "color": "default"} 
+                    ]
+                }
+            },
+            "Recommended By": {
+                "type": "select",
+                "select": {}
+            },
+            "Want To Read": {
+                "type": "multi_select", 
+                "multi_select": {} 
+            }          
+    }
+    properties["Genre"] = {
+        "type": "select",
+        "select": {
+            "options": [
+                {"name": genre.replace('-', ' ').title(), "color": "default"} 
+                for genre in valid_genres
+            ]
+        } 
+    }   
+    args = {"parent":parent, "title":title, "properties":properties}
     #use client and endpoint 
-    
+    response = notion.databases.create(**args)
     #return id 
-    raise NotImplementedError
+    return response['id']
 
 # TODO: untesetd 
 def add_booklist_page(book: Book, database_id: str) -> str: 
