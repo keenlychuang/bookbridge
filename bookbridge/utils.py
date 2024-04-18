@@ -250,7 +250,7 @@ def infer_emoji(book: Book) -> str:
     raise NotImplementedError 
 
 # TODO: untesetd 
-def create_booklist_database(parent_page: str) -> str:
+def create_booklist_database(parent_page: str, notion_key:str) -> str:
     """
     Creates a Notion database and returns the associated database id. Include properties for 
     Title, Author, Genre, Status, Rating and Rec By. Include blurb as a subpage. 
@@ -261,6 +261,13 @@ def create_booklist_database(parent_page: str) -> str:
     Returns:
     - database_id (str): the ID of the created database
     """
+    notion = Client(auth=notion_key)
+    
+    #create dict/json
+
+    #use client and endpoint 
+    
+    #return id 
     raise NotImplementedError
 
 # TODO: untesetd 
@@ -320,4 +327,4 @@ def is_emoji(s:str) -> bool:
     def in_range(uchar):
         return any(start <= uchar <= end for start, end in emoji_ranges)
 
-    return all(in_range(s)) 
+    return all(in_range(char) for char in s) 

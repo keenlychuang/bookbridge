@@ -166,7 +166,7 @@ def test_sample_booklist():
 def test_is_emoji(): 
     test_strings = ['\ud83d\ude00', '\ud83d\ude80', 'Hello, world!', '\ud83d\udc4d\ud83d\udc4e']
     results = [is_emoji(candidate) for candidate in test_strings]
-    assert results == [True, True, False, True, True]
+    assert results == [True, True, False, True]
 
 
 if __name__ == "__main__":
