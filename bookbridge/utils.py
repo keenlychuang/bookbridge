@@ -9,6 +9,7 @@ import os
 from tqdm import tqdm
 from typing import Literal, Optional, List
 from dotenv import load_dotenv
+from notion_client import Client
 import unicodedata
 
 load_dotenv() 
@@ -16,6 +17,12 @@ notion_key = os.getenv('NOTION_SECRET_KEY')
 # Genre = Literal['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
 # valid_genres = ['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
 valid_genres = [
+                'fiction', 'non-fiction', 'biography', 'mystery', 'fantasy', 'science-fiction',
+                'historical', 'romance', 'thriller', 'self-help', 'poetry', 'graphic-novel', 
+                'adventure', 'horror', 'true-crime', 'childrens', 'young-adult', 'classic-literature', 
+                'philosophy', 'anthology', 'memoir', 'short-story', 'historical-fiction', 
+]
+Genre = Literal[
                 'fiction', 'non-fiction', 'biography', 'mystery', 'fantasy', 'science-fiction',
                 'historical', 'romance', 'thriller', 'self-help', 'poetry', 'graphic-novel', 
                 'adventure', 'horror', 'true-crime', 'childrens', 'young-adult', 'classic-literature', 
@@ -57,7 +64,7 @@ class Book:
         self.completed = completed
         self.rating = rating
 
-        #TODO Impelment Rec By 
+        #TODO Non-essential properties 
         self.rec_by = None 
         self.emoji = None 
         self.notes = None
@@ -109,7 +116,7 @@ class Book:
             f"    Rating: {self.rating or 'N/A'}\n"
         )
 
-def llm_api_call(prompt: str, max_tokens: int = 1000, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = "gpt-4-0125-preview") -> str:
+def llm_api_call(prompt: str, max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = "gpt-4-turbo") -> str:
     """
     Calls the GPT-4 API using a provided text prompt to generate text.
 
@@ -126,7 +133,7 @@ def llm_api_call(prompt: str, max_tokens: int = 1000, temperature: float = 0.7, 
     """
     load_dotenv() 
     client = OpenAI() 
-    gpt_role_prompt = "You are an AI assistant that can help with a variety of tasks." 
+    gpt_role_prompt = "You are an AI assistant that can help with a variety of tasks."  
     gpt_user_prompt = prompt
     combined_prompt=[{"role": "assistant", "content": gpt_role_prompt}, {"role": "user", "content": gpt_user_prompt}]
     response = client.chat.completions.create(
@@ -226,7 +233,6 @@ def extract_text_from_pdf(pdf_path: str) -> str:
             text += page.get_text()
     return text
 
-# TODO: untesetd 
 def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page: str): 
     """ 
     Given a list of Books, creates a Notion Database with entries corresponding to each book.
@@ -240,9 +246,14 @@ def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page
     - database_id (str): the database id associated with the new Notion database 
 
     """ 
-    raise NotImplementedError("Not Yet Finished")
+    # create database on parent page 
+    database_id = create_booklist_database(parent_page=parent_page, notion_key=notion_key) 
+    # for each book in booklist, add page 
+    for book in booklist:
+        page_id = add_booklist_page(book, database_id, notion_key=notion_key)
+    return database_id
 
-# TODO: untesetd 
+
 def infer_emoji(book: Book) -> str: 
     """
     Uses an LLM API call to infer an appropriate emoji representing the book
@@ -253,7 +264,16 @@ def infer_emoji(book: Book) -> str:
     Returns: 
     - emoji (str):  A Unicode Emoji to represent the book 
     """
-    
+    #fill book if not already complete 
+    book.llm_autofill() 
+    #contsruct prompt 
+    full_prompt = emoji_prompt + book.blurb
+    #llmapi call 
+    response_text = llm_api_call(full_prompt)
+    #quality check
+    assert is_emoji(response_text)
+    return response_text
+
 
 def create_booklist_database(parent_page: str, notion_key:str) -> str:
     """
@@ -269,7 +289,7 @@ def create_booklist_database(parent_page: str, notion_key:str) -> str:
     notion = Client(auth=notion_key)
     
     #create dict/json
-    parent = {"type": "page_id","page_id": page_id}
+    parent = {"type": "page_id","page_id": parent_page}
     title = [
                 {
                     "type": "text",
@@ -355,8 +375,7 @@ def create_booklist_database(parent_page: str, notion_key:str) -> str:
     #return id 
     return response['id']
 
-# TODO: untesetd 
-def add_booklist_page(book: Book, database_id: str) -> str: 
+def add_booklist_page(book: Book, database_id: str, notion_key: str) -> str: 
     """
     Adds a row to the database representing the booklist in Notion, cooresponding to the supplied Book. 
 
@@ -367,7 +386,68 @@ def add_booklist_page(book: Book, database_id: str) -> str:
     Returns: 
     - id (str): the id of the new booklist page in the database 
     """
-    raise NotImplementedError 
+    # create client 
+    notion = Client(auth=notion_key)
+    parent= {"database_id":database_id}
+    icon = infer_emoji(book)
+    status_name = "Completed" if book.completed else "Not Started"
+
+    properties = {
+        'Title': {
+            "title": [
+                {"text": {"content": book.title}}
+            ]
+        },
+        'Rating': {
+            "select": {
+                "name":"Not Rated"
+            }
+        },
+        'Author': {
+            "rich_text": [
+                {"text": {"content": book.author}}
+            ]
+        },
+        'Status': {
+            "select": {"name":status_name}
+        },
+        'Genre': {
+            "select": {"name":book.genre.replace('-', ' ').title()}
+        },
+    }
+    children = [
+        {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": book.blurb,
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+
+    icon = {
+        "type": "emoji",
+        "emoji": "📚"
+    }
+
+    args = {
+        "parent":parent,
+        "properties":properties,
+        "icon":icon, 
+        "children":children
+    }
+
+    #api call 
+    response = notion.pages.create(**args)
+    return response["id"]
+
 
 def sample_book() -> Book:
     """

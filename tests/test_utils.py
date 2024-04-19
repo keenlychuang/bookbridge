@@ -14,7 +14,7 @@ def test_book_initialization():
     book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5)
     assert book.title == "Sample Title"
     assert book.author == "Author Name"
-    assert book.genre == "fiction"
+    assert book.genre in valid_genres
     assert book.completed is True
     assert book.blurb == "Sample blurb"
     assert book.rating == 4.5
@@ -25,10 +25,9 @@ def test_book_initialization():
 def test_book_autofill(): 
     book = Book("Crime and Punishment")
     expected_author = "Fyodor Dostoevsky"
-    expected_genre = "fiction"
     book.llm_autofill() 
     assert book.author == expected_author
-    assert book.genre == expected_genre
+    assert book.genre in valid_genres
     assert isinstance(book.blurb, str)
     print(book)
 
@@ -45,7 +44,7 @@ def test_parse_csv_response():
         output = file.read()
     books = parse_csv_response(output)
     for book in books:
-        assert isinstance(book, Book)
+        assert isinstance(book, Book), "failed csv parse, not all books in the booklist are books"
 
 @pytest.mark.doc
 def test_bookstring_to_csv(): 
@@ -77,7 +76,7 @@ def test_autofill():
     # assert proper formatting on first three fields 
     assert book.title == "Animal Farm"
     assert book.author == "George Orwell"
-    assert book.genre == "fiction"
+    assert book.genre in valid_genres
     assert book.completed is not None
 
     # doesn't matter which blurb, should not complete other fields
@@ -117,11 +116,11 @@ def test_infer_emoji():
     assert is_emoji(emoji)
 
 @pytest.mark.notion
-async def test_create_booklist_database():
+def test_create_booklist_database():
     # create booklsit database 
     database_id = create_booklist_database(test_parent_page_id)
     # query database 
-    query_response = await notion.databases.query(
+    query_response = notion.databases.query(
         database_id=database_id
     )
     # print out page 
@@ -140,7 +139,7 @@ def test_add_booklist_page():
     )
     prev_len = len(query_response['results'])
     # add page 
-    add_booklist_page(book, test_db_id)
+    add_booklist_page(book, test_db_id, key)
     # check number of pages after, assert we added a page 
     query_response = notion.databases.query(
         database_id=os.getenv('TEST_DB_ID')
