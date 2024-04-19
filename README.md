@@ -1,3 +1,7 @@
+<div align="center">
+    <img src="./assets/icon_color.png" alt="Icon Alt Text" title="Icon Title" width="256"/>
+</div>
+
 # BookBridge - Booklist Import Tool
 
 # Booklist Import Tool
@@ -21,3 +25,6 @@ This project serves multiple purposes:
 
 3. **Sharability:** Create a subspace within my workspace to share with friends and develop shareable code/scripts for broader use.
 
+## Installation (Under Construction)
+
+## Screenshots (Under Construction)
