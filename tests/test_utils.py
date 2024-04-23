@@ -4,6 +4,7 @@ import asyncio
 import os 
 from typing import Literal, Optional 
 from bookbridge.utils import *
+from bookbridge.book import * 
 from notion_client import Client
 
 load_dotenv() 
@@ -67,6 +68,17 @@ def test_pdf_to_bookslist():
     path = "data/test/synthetic_booklists/test_booklist_5.pdf"
     books = pdf_to_booklist(path)
     assert len(books) == 5
+
+@pytest.mark.integration
+def test_pdf_to_notion():
+    # sample path to pdf, notion key, and parent page 
+    path = "data/test/synthetic_booklists/test_booklist_5.pdf"
+    notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
+    test_parent_page_id = test_parent_page_id
+    # function call 
+    id = pdf_to_notion(path, test_parent_page_id, notion_key)
+    # go check that the page actually contains a good booklist 
+    print(f"Go Check Out Your New Page!")
 
 @pytest.mark.doc
 def test_autofill():

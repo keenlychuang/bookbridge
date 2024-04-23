@@ -1,6 +1,7 @@
 import requests
 import json 
 import pickle
+from book import *
 from openai import OpenAI
 import csv 
 import fitz
@@ -14,8 +15,6 @@ import unicodedata
 
 load_dotenv() 
 notion_key = os.getenv('NOTION_SECRET_KEY')
-# Genre = Literal['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
-# valid_genres = ['fiction', 'non-fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'historical', 'biography', 'poetry', 'self-help', 'young adult']
 valid_genres = [
                 'fiction', 'non-fiction', 'biography', 'mystery', 'fantasy', 'science-fiction',
                 'historical', 'romance', 'thriller', 'self-help', 'poetry', 'graphic-novel', 
@@ -41,80 +40,6 @@ with open('prompts/infer_author.txt', 'r') as file:
     author_prompt = file.read() 
 with open('prompts/infer_blurb.txt', 'r') as file:
     blurb_prompt = file.read() 
-
-class Book:
-    def __init__(self, title: str, author: str = None, genre: Optional[Genre] = None, completed: bool = False, blurb: str = None, rating: float = None):
-        """
-        Initializes a new Book instance.
-
-        Parameters:
-        - title (str): The title of the book.
-        - author (str, optional): The author of the book. Default is None.
-        - genre (Optional[Genre], optional): The genre of the book from a predefined set. Default is None.
-        - completed (bool, optional): Flag indicating if the book has been read. Default is False.
-        - blurb (str, optional): A short description or blurb of the book. Default is None.
-        - rating (float, optional): The personal rating given to the book. Default is None.
-        # - notes (str, optional): Additional notes or comments about the book. Default is None.
-        """
-        assert title is not None, "Title cannot be None"
-        self.title = title
-        self.author = author
-        self.genre = genre
-        self.blurb = blurb
-        self.completed = completed
-        self.rating = rating
-
-        #TODO Non-essential properties 
-        self.rec_by = None 
-        self.emoji = None 
-        self.notes = None
-
-    def llm_autofill(self) -> str:
-        """
-        Automatically fills missing fields of the book instance using a language model API.
-
-        Returns:
-        str: A status message indicating success or details of the missing fields filled.
-        
-        Raises:
-        NotImplementedError: Indicates the method hasn't been implemented yet.
-        """
-        authored, genred, blurbed = False, False, False
-        #fill author 
-        if self.author is None: 
-            prompt = author_prompt + f"\n\n{self.title}"
-            author_string = llm_api_call(prompt=prompt)
-            self.author = author_string 
-        #fill genre 
-        if self.genre is None: 
-            prompt = genre_prompt + f"\n{valid_genres_string}\n\n{self.title}"
-            genre_string = llm_api_call(prompt=prompt)
-            assert genre_string in valid_genres
-            self.genre = genre_string
-        #fill blurb 
-        if self.blurb is None: 
-            prompt = blurb_prompt + f"\n\n{self.title}"
-            blurb_string =llm_api_call(prompt=prompt)
-            self.blurb = blurb_string
-
-
-    def __str__(self) -> str:
-        """
-        Provides a formatted string representation of the book instance.
-
-        Returns:
-        str: A string detailing the book's title, author, and other attributes.
-
-        """
-        completed_str = "Yes" if self.completed else "No"
-        return (
-            f"Title: {self.title}\n"
-            f"    Author: {self.author or 'N/A'}\n"
-            f"    Genre: {self.genre or 'N/A'}\n"
-            f"    Completed: {completed_str}\n"
-            f"    Blurb: {self.blurb or 'N/A'}\n"
-            f"    Rating: {self.rating or 'N/A'}\n"
-        )
 
 def llm_api_call(prompt: str, max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = "gpt-4-turbo") -> str:
     """
@@ -215,7 +140,6 @@ def parse_csv_response(response_text: str, autofill:bool = True) -> List[Book]:
         for book in tqdm(books, "autofilling fields"):
             book.llm_autofill()
     return books
-
 
 def extract_text_from_pdf(pdf_path: str) -> str:
     """
@@ -448,29 +372,6 @@ def add_booklist_page(book: Book, database_id: str, notion_key: str) -> str:
     response = notion.pages.create(**args)
     return response["id"]
 
-
-def sample_book() -> Book:
-    """
-    Returns a sample Book object with non-emoji parameters autofilled 
-    """ 
-    book = Book("Crime and Punishment")
-    book.llm_autofill() 
-    return book 
-
-def sample_booklist() -> List: 
-    """
-    Returns a sample booklist, a python List of Book objects with their non-emoji parameters autofilled 
-    """
-    booklist = [Book("Crime and Punishment"), 
-                Book("The Cat in the Hat"), 
-                Book("Eragon"),
-                Book("Dune"),
-                Book("Never Finished")
-                ] 
-    for book in booklist:
-        book.llm_autofill()
-    return booklist 
-
 def is_emoji(s:str) -> bool:
     """
     Determines if the string s is a valid emoji in unicode 
@@ -493,3 +394,18 @@ def is_emoji(s:str) -> bool:
         return any(start <= uchar <= end for start, end in emoji_ranges)
 
     return all(in_range(char) for char in s) 
+
+#TODO: untested 
+def pdf_to_notion(path:str, parent_page:str, notion_key:str) -> str: 
+    """
+    Given the str path to a pdf containing a booklist, attempt to convert the booklist to a new notion database and return the database id. 
+
+    Params: 
+    - path (str): the path to the pdf booklist 
+    - parent_page (str): the id of the parent page that will contain the new database 
+    - notion_key (str): the api key for the integration with access to the notion parent page of the new database 
+
+    Returns:
+    - id (str): the database id of the notion database containing the inferred information from the booklist. 
+    """
+    raise NotImplementedError 
