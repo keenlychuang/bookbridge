@@ -38,8 +38,8 @@ class Book:
         self.blurb = blurb
         #TODO: Including "inprogress" for status 
         self.completed = completed
-        self.rating = rating
-        self.rating_selection = None
+        self.rating = round(rating)
+        self.rating_selection = "Not Rated"
 
         #TODO Non-essential properties 
         self.rec_by = None 

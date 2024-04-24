@@ -25,17 +25,21 @@ def bookstring_to_csv(bookstring:str)-> str:
     return csv_formatted
 
 def is_valid_csv(csv_string):
-    rows = csv_string.strip().split("\n")
+    # Use StringIO to convert the string into a file-like object for the CSV reader
+    csv_file_like_object = io.StringIO(csv_string)
+    
+    reader = csv.reader(csv_file_like_object)
+    rows = list(reader)
+    
+    if not rows:
+        return False  # Returns False for empty CSV strings
     
     # Determine the number of columns from the header row
-    num_columns = len(rows[0].split(","))
+    num_columns = len(rows[0])
     
     for row in rows:
-        # Basic parsing of CSV row, not handling special cases like quotes
-        fields = row.split(",")
-        
-        # Check if the number of fields in this row matches the header
-        if len(fields) != num_columns:
+        # Now fields are correctly parsed by the csv.reader
+        if len(row) != num_columns:
             return False
     
     return True
@@ -44,12 +48,13 @@ def pdf_to_booklist(path:str):
     #pdf to string
     string = extract_text_from_pdf(path)
     #string to csv 
+    print("Restructuring your booklist...")
     csv = bookstring_to_csv(string)
     try:
         assert is_valid_csv(csv)
     except:
-        raise ValueError("Invalid CSV")
         print(csv)
+        raise ValueError("Invalid CSV")
     #parse_response
     return parse_csv_response(csv)
 
@@ -119,12 +124,12 @@ def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page
     # create database on parent page 
     database_id = create_booklist_database(parent_page=parent_page, notion_key=notion_key) 
     # for each book in booklist, add page 
-    for book in booklist:
+    for book in tqdm(booklist, "converting to notion"):
         page_id = add_booklist_page(book, database_id, notion_key=notion_key)
     return database_id
 
 
-def infer_emoji(book: Book) -> str: 
+def infer_emoji(book: Book) -> str:
     """
     Uses an LLM API call to infer an appropriate emoji representing the book
 
@@ -132,19 +137,36 @@ def infer_emoji(book: Book) -> str:
     - book (Book): The book to infer an emoji for 
 
     Returns: 
-    - emoji (str):  A Unicode Emoji to represent the book 
+    - emoji (str): A Unicode Emoji to represent the book 
+
+    Attempts the API call up to three times if necessary.
     """
-    #fill book if not already complete 
-    book.llm_autofill() 
-    #contsruct prompt 
-    with open('prompts/request_emoji.txt', 'r') as file: 
+    # Fill book if not already complete
+    book.llm_autofill()
+    # Construct prompt
+    with open('prompts/request_emoji.txt', 'r') as file:
         emoji_prompt = file.read()
     full_prompt = emoji_prompt + book.blurb
-    #llmapi call 
-    response_text = llm_api_call(full_prompt)
-    #quality check
-    assert is_emoji(response_text)
-    return response_text
+
+    max_attempts = 2
+    attempts = 0
+    
+    while attempts < max_attempts:
+        try:
+            # LLM API call
+            response_text = llm_api_call(full_prompt)
+            # Quality check
+            if is_emoji(response_text):
+                return response_text
+            else:
+                attempts += 1
+                print(f"Attempt {attempts}: Emoji response did not pass quality check. Retrying...")
+        except Exception as e:
+            attempts += 1
+            print(f"Attempt {attempts}: API call failed with error: {e}. Retrying...")
+
+    print(response_text)
+    raise ValueError("Failed to infer an emoji after maximum attempts.")
 
 
 def create_booklist_database(parent_page: str, notion_key:str) -> str:
@@ -322,9 +344,9 @@ def add_booklist_page(book: Book, database_id: str, notion_key: str) -> str:
     response = notion.pages.create(**args)
     return response["id"]
 
-def is_emoji(s:str) -> bool:
+def is_emoji(s: str) -> bool:
     """
-    Determines if the string s is a valid emoji in unicode 
+    Determines if the string s contains at least one valid emoji.
     """
     emoji_ranges = [
         ('\U0001F600', '\U0001F64F'),  # Emoticons
@@ -342,8 +364,9 @@ def is_emoji(s:str) -> bool:
 
     def in_range(uchar):
         return any(start <= uchar <= end for start, end in emoji_ranges)
-
-    return all(in_range(char) for char in s) 
+    
+    # Check if any character in the string falls within any emoji range
+    return any(in_range(char) for char in s)
 
 def search_notion_id(url:str) -> str: 
     """
@@ -362,7 +385,6 @@ def search_notion_id(url:str) -> str:
         print("No Notion Page ID found in the URL.")
     return page_id 
 
-
 def pdf_to_notion(path:str, parent_page:str, notion_key:str) -> str: 
     """
     Given the str path to a pdf containing a booklist, attempt to convert the booklist to a new notion database and return the database id. 
@@ -376,7 +398,9 @@ def pdf_to_notion(path:str, parent_page:str, notion_key:str) -> str:
     - id (str): the database id of the notion database containing the inferred information from the booklist. 
     """
     # pdf to python list 
+    print("Reading through your booklist...")
     booklist = pdf_to_booklist(path)
     # python list to notion 
+    print("Creating a Notion page for you...")
     id = python_to_notion_database(notion_key, booklist, parent_page)
     return id 
