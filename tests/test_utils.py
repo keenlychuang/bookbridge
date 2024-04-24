@@ -205,6 +205,27 @@ def test_add_booklist_page():
     )
     assert len(query_response['results']) - 1 == prev_len
 
+@pytest.mark.notion 
+def test_add_booklist_page_new_select(): 
+    book = sample_book() 
+    key = os.getenv('TEST_NOTION_SECRET_KEY')
+    notion = Client(auth=key)
+    # assume we have a valid booklist database ID already with properly formatted properties 
+    test_db_id = os.getenv('TEST_DB_ID')
+    # check number of pages before 
+    query_response = notion.databases.query(
+        database_id=os.getenv('TEST_DB_ID')
+    )
+    prev_len = len(query_response['results'])
+    # add page 
+    book.genre = "new-genre"
+    add_booklist_page(book, test_db_id, key)
+    # check number of pages after, assert we added a page 
+    query_response = notion.databases.query(
+        database_id=os.getenv('TEST_DB_ID')
+    )
+    assert len(query_response['results']) - 1 == prev_len
+
 @pytest.mark.doc
 def test_sample_book(): 
     # call function

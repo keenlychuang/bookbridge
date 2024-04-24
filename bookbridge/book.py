@@ -58,20 +58,21 @@ class Book:
         Raises:
         NotImplementedError: Indicates the method hasn't been implemented yet.
         """
+        light_model = "gpt-3.5-turbo"
         authored, genred, blurbed = False, False, False
         #fill author 
         if self.author is None: 
             with open('prompts/infer_author.txt', 'r') as file:
                 author_prompt = file.read() 
             prompt = author_prompt + f"\n\n{self.title}"
-            author_string = llm_api_call(prompt=prompt)
+            author_string = llm_api_call(prompt=prompt,model=light_model)
             self.author = author_string 
         #fill genre 
         if self.genre is None: 
             with open('prompts/infer_genre.txt', 'r') as file:
                 genre_prompt = file.read() 
             prompt = genre_prompt + f"\n{valid_genres_string}\n\n{self.title}"
-            genre_string = llm_api_call(prompt=prompt)
+            genre_string = llm_api_call(prompt=prompt, model=light_model)
             assert genre_string in valid_genres
             self.genre = genre_string
         #fill blurb 
@@ -79,7 +80,7 @@ class Book:
             with open('prompts/infer_blurb.txt', 'r') as file:
                 blurb_prompt = file.read() 
             prompt = blurb_prompt + f"\n\n{self.title}"
-            blurb_string =llm_api_call(prompt=prompt)
+            blurb_string =llm_api_call(prompt=prompt, model=light_model)
             self.blurb = blurb_string
     
     def update_rating_selection(self) -> None: 

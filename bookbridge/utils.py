@@ -269,7 +269,11 @@ def create_booklist_database(parent_page: str, notion_key:str) -> str:
             ]
         } 
     }   
-    args = {"parent":parent, "title":title, "properties":properties}
+    icon = {
+        "type": "emoji",
+        "emoji": "📚"
+    }
+    args = {"parent":parent, "title":title, "properties":properties, "icon":icon}
     #use client and endpoint 
     response = notion.databases.create(**args)
     #return url
