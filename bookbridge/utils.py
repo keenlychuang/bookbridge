@@ -5,6 +5,7 @@ import csv
 import fitz
 import io 
 import os 
+import re
 import unicodedata
 from bookbridge.book import *
 from tqdm import tqdm
@@ -343,6 +344,24 @@ def is_emoji(s:str) -> bool:
         return any(start <= uchar <= end for start, end in emoji_ranges)
 
     return all(in_range(char) for char in s) 
+
+def search_notion_id(url:str) -> str: 
+    """
+        Searches a url for a notion_id and returns the str if one matches 
+    """
+    # Regular expression to extract the Notion page ID
+    regex = r"([a-zA-Z0-9]{32})$"
+    # Search for the pattern in the URL
+    match = re.search(regex, url)
+
+    if match:
+        page_id = match.group(1)
+        print(f"Notion Page ID: {page_id}")
+    else:
+        page_id = None 
+        print("No Notion Page ID found in the URL.")
+    return page_id 
+
 
 def pdf_to_notion(path:str, parent_page:str, notion_key:str) -> str: 
     """

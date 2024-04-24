@@ -101,6 +101,17 @@ def test_pdf_to_notion_base():
     print(f"Go Check Out Your New Page!")
 
 @pytest.mark.integration 
+def test_pdf_to_notion_10(): 
+    # sample path to pdf, notion key, and parent page 
+    path = "data/test/synthetic_booklists/test_booklist_10.pdf"
+    notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
+    test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
+    # function call 
+    id = pdf_to_notion(path, test_parent_page_id, notion_key)
+    # go check that the page actually contains a good booklist 
+    print(f"Go Check Out Your New Page!")
+
+@pytest.mark.integration 
 def test_pdf_to_notion_25(): 
     path = "data/test/synthetic_booklists/test_booklist_25.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
@@ -210,6 +221,23 @@ def test_is_emoji():
     results = [is_emoji(candidate) for candidate in test_strings]
     assert results == [True, True, False, True]
 
+@pytest.mark.doc 
+def test_search_notion_id(): 
+    def test_extract_valid_id():
+        # Test with a valid Notion URL
+        self.assertEqual(search_notion_id("https://www.notion.so/WorkspaceName/Page-Name-12ab34cd56ef7890ghij1234"), "12ab34cd56ef7890ghij1234", "Should extract the correct page ID")
+
+    def test_extract_invalid_id():
+        # Test with an invalid Notion URL (no page ID)
+        self.assertIsNone(search_notion_id("https://www.notion.so/WorkspaceName/Page-Name"), "Should return None for invalid URL")
+
+    def test_extract_from_incomplete_url():
+        # Test with an incomplete URL
+        self.assertIsNone(search_notion_id("https://www.notion.so"), "Should return None for incomplete URL")
+    
+    test_extract_invalid_id()
+    test_extract_invalid_id()
+    test_extract_text_from_pdf() 
 
 if __name__ == "__main__":
     pytest.main()
