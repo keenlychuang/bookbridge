@@ -10,7 +10,7 @@ from notion_client import Client
 load_dotenv() 
 test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
 
-@pytest.mark.doc
+@pytest.mark.book
 def test_book_initialization():
     book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5)
     assert book.title == "Sample Title"
@@ -22,7 +22,27 @@ def test_book_initialization():
     return book 
     # assert book.notes == "Sample notes"
 
-@pytest.mark.doc
+@pytest.mark.book
+def test_update_rating_selection(): 
+    book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", None)
+    assert book.rating_selection == None 
+    book.rating = 1 
+    book.update_rating_selection() 
+    assert book.rating_selection == "⭐"
+    book.rating = 2
+    book.update_rating_selection() 
+    assert book.rating_selection == "⭐⭐"
+    book.rating = 3
+    book.update_rating_selection() 
+    assert book.rating_selection == "⭐⭐⭐"
+    book.rating = 4
+    book.update_rating_selection() 
+    assert book.rating_selection == "⭐⭐⭐⭐"
+    book.rating = 5
+    book.update_rating_selection() 
+    assert book.rating_selection == "⭐⭐⭐⭐⭐"\
+
+@pytest.mark.book
 def test_book_autofill(): 
     book = Book("Crime and Punishment")
     expected_author = "Fyodor Dostoevsky"
@@ -70,15 +90,26 @@ def test_pdf_to_bookslist():
     assert len(books) == 5
 
 @pytest.mark.integration
-def test_pdf_to_notion():
+def test_pdf_to_notion_base():
     # sample path to pdf, notion key, and parent page 
     path = "data/test/synthetic_booklists/test_booklist_5.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
-    test_parent_page_id = test_parent_page_id
+    test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     id = pdf_to_notion(path, test_parent_page_id, notion_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page!")
+
+@pytest.mark.integration 
+def test_pdf_to_notion_25(): 
+    path = "data/test/synthetic_booklists/test_booklist_25.pdf"
+    notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
+    test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
+    # function call 
+    id = pdf_to_notion(path, test_parent_page_id, notion_key)
+    # go check that the page actually contains a good booklist 
+    print(f"Go Check Out Your New Page!")
+
 
 @pytest.mark.doc
 def test_autofill():
