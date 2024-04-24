@@ -6,13 +6,13 @@ valid_genres = [
                 'fiction', 'non-fiction', 'biography', 'mystery', 'fantasy', 'science-fiction',
                 'historical', 'romance', 'thriller', 'self-help', 'poetry', 'graphic-novel', 
                 'adventure', 'horror', 'true-crime', 'childrens', 'young-adult', 'classic-literature', 
-                'philosophy', 'anthology', 'memoir', 'short-story', 'historical-fiction', 
+                'philosophy', 'anthology', 'memoir', 'short-story', 'historical-fiction', 'magical-realism'
                 ]
 Genre = Literal[
                 'fiction', 'non-fiction', 'biography', 'mystery', 'fantasy', 'science-fiction',
                 'historical', 'romance', 'thriller', 'self-help', 'poetry', 'graphic-novel', 
                 'adventure', 'horror', 'true-crime', 'childrens', 'young-adult', 'classic-literature', 
-                'philosophy', 'anthology', 'memoir', 'short-story', 'historical-fiction', 
+                'philosophy', 'anthology', 'memoir', 'short-story', 'historical-fiction', 'magical-realism'
                 ]
 valid_genres_string = str(valid_genres)
 
@@ -38,7 +38,7 @@ class Book:
         self.blurb = blurb
         #TODO: Including "inprogress" for status 
         self.completed = completed
-        self.rating = round(rating)
+        self.rating = round(rating) if rating is not None else None 
         self.rating_selection = "Not Rated"
 
         #TODO Non-essential properties 

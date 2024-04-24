@@ -18,14 +18,14 @@ def test_book_initialization():
     assert book.genre in valid_genres
     assert book.completed is True
     assert book.blurb == "Sample blurb"
-    assert book.rating == 4.5
+    assert book.rating == 4
     return book 
     # assert book.notes == "Sample notes"
 
 @pytest.mark.book
 def test_update_rating_selection(): 
     book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", None)
-    assert book.rating_selection == None 
+    assert book.rating_selection == "Not Rated" 
     book.rating = 1 
     book.update_rating_selection() 
     assert book.rating_selection == "⭐"
@@ -40,7 +40,7 @@ def test_update_rating_selection():
     assert book.rating_selection == "⭐⭐⭐⭐"
     book.rating = 5
     book.update_rating_selection() 
-    assert book.rating_selection == "⭐⭐⭐⭐⭐"\
+    assert book.rating_selection == "⭐⭐⭐⭐⭐"
 
 @pytest.mark.book
 def test_book_autofill(): 
@@ -64,12 +64,13 @@ def test_parse_csv_response():
     with open('data/test/synthetic_booklists/sample.csv', 'r') as file:
         output = file.read()
     books = parse_csv_response(output)
+    print(books)
     for book in books:
         assert isinstance(book, Book), "failed csv parse, not all books in the booklist are books"
 
 @pytest.mark.doc
 def test_bookstring_to_csv(): 
-    with open("data/test/synthetic_booklists/sample_booklist.txt", 'r') as file: 
+    with open("data/test/synthetic_booklists/sample_booklist_20.txt", 'r') as file: 
         string = file.read() 
     csv = bookstring_to_csv(string)
     print(csv)
@@ -96,9 +97,9 @@ def test_pdf_to_notion_base():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    id = pdf_to_notion(path, test_parent_page_id, notion_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key)
     # go check that the page actually contains a good booklist 
-    print(f"Go Check Out Your New Page!")
+    print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.integration 
 def test_pdf_to_notion_10(): 
@@ -107,9 +108,9 @@ def test_pdf_to_notion_10():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    id = pdf_to_notion(path, test_parent_page_id, notion_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key)
     # go check that the page actually contains a good booklist 
-    print(f"Go Check Out Your New Page!")
+    print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.integration 
 @pytest.mark.skip
@@ -118,9 +119,9 @@ def test_pdf_to_notion_25():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    id = pdf_to_notion(path, test_parent_page_id, notion_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key)
     # go check that the page actually contains a good booklist 
-    print(f"Go Check Out Your New Page!")
+    print(f"Go Check Out Your New Page: {url}")
 
 
 @pytest.mark.doc
@@ -153,13 +154,13 @@ def test_python_to_notion_database():
     #load up notion client 
     notion = Client(auth=os.getenv('TEST_NOTION_SECRET_KEY'))
     # create database and return id 
-    id = python_to_notion_database(notion_key, booklist, parent_page)
+    url = python_to_notion_database(notion_key, booklist, parent_page)
+    id = search_notion_id(url)
     # print out pages 
     query_response = notion.databases.query(
         database_id = id 
     )
     print(query_response['results'])
-    
 
 @pytest.mark.notion 
 def test_infer_emoji(): 
@@ -173,8 +174,11 @@ def test_infer_emoji():
 @pytest.mark.notion
 def test_create_booklist_database():
     # create booklsit database 
-    database_id = create_booklist_database(test_parent_page_id)
+    notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
+    url = create_booklist_database(test_parent_page_id, notion_key)
+    database_id = search_notion_id(url)
     # query database 
+    notion = Client(auth=notion_key) 
     query_response = notion.databases.query(
         database_id=database_id
     )
@@ -222,23 +226,24 @@ def test_is_emoji():
     results = [is_emoji(candidate) for candidate in test_strings]
     assert results == [True, True, False, True]
 
-@pytest.mark.doc 
-def test_search_notion_id(): 
-    def test_extract_valid_id():
-        # Test with a valid Notion URL
-        self.assertEqual(search_notion_id("https://www.notion.so/WorkspaceName/Page-Name-12ab34cd56ef7890ghij1234"), "12ab34cd56ef7890ghij1234", "Should extract the correct page ID")
+@pytest.mark.doc
+def test_search_notion_id_with_valid_url():
+    """Test searching a Notion ID from a valid URL."""
+    expected_id = "86b6f5858bcf4ec797177c5ac80fcd63"
+    actual_id = search_notion_id("https://www.notion.so/86b6f5858bcf4ec797177c5ac80fcd63")
+    assert actual_id == expected_id, f"Expected to extract '{expected_id}', but got '{actual_id}' instead."
 
-    def test_extract_invalid_id():
-        # Test with an invalid Notion URL (no page ID)
-        self.assertIsNone(search_notion_id("https://www.notion.so/WorkspaceName/Page-Name"), "Should return None for invalid URL")
+@pytest.mark.doc
+def test_search_notion_id_with_invalid_url():
+    """Test searching a Notion ID from an invalid URL (missing ID)."""
+    actual_id = search_notion_id("https://www.notion.so/WorkspaceName/Page-Name")
+    assert actual_id is None, "Expected to get None for a URL without a page ID."
 
-    def test_extract_from_incomplete_url():
-        # Test with an incomplete URL
-        self.assertIsNone(search_notion_id("https://www.notion.so"), "Should return None for incomplete URL")
+@pytest.mark.doc
+def test_search_notion_id_with_incomplete_url():
+    """Test searching a Notion ID from an incomplete URL."""
+    actual_id = search_notion_id("https://www.notion.so")
+    assert actual_id is None, "Expected to get None for an incomplete URL."
     
-    test_extract_invalid_id()
-    test_extract_invalid_id()
-    test_extract_text_from_pdf() 
-
 if __name__ == "__main__":
     pytest.main()

@@ -1,4 +1,4 @@
 You will be provided with the title of a book. 
-Your task is to respond with the genre that most closely matches it. 
+Your task is to respond with the genre that most closely matches it, picking from the list below. 
 Only respond with the genre that the title best matches, with no other wording. 
 Keep the genre names in all lower case. Pick from the following list. DO NOT respond with a genre outside the list. 

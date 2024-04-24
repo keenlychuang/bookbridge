@@ -22,9 +22,13 @@ def bookstring_to_csv(bookstring:str)-> str:
         processing_prompt = file.read() 
     prompt_full = processing_prompt + bookstring
     csv_formatted = llm_api_call(prompt_full)
+    print("Reformatted booklist...")
     return csv_formatted
 
-def is_valid_csv(csv_string):
+def is_valid_csv(csv_string:str):
+    """
+    Determines if the csv_string is in a valid csv format that could be processed by the csv package 
+    """
     # Use StringIO to convert the string into a file-like object for the CSV reader
     csv_file_like_object = io.StringIO(csv_string)
     
@@ -118,15 +122,16 @@ def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page
     - parent_page (str): the id of the parent page where the book will be created 
     
     Returns: 
-    - database_id (str): the database id associated with the new Notion database 
+    - url (str): the url associated with the new Notion database 
 
     """ 
     # create database on parent page 
-    database_id = create_booklist_database(parent_page=parent_page, notion_key=notion_key) 
+    url = create_booklist_database(parent_page=parent_page, notion_key=notion_key) 
+    database_id = search_notion_id(url)
     # for each book in booklist, add page 
     for book in tqdm(booklist, "converting to notion"):
         page_id = add_booklist_page(book, database_id, notion_key=notion_key)
-    return database_id
+    return url
 
 
 def infer_emoji(book: Book) -> str:
@@ -178,7 +183,7 @@ def create_booklist_database(parent_page: str, notion_key:str) -> str:
     - parent_page (str): the ID of the parent page of the database, which can be another page, database, or workspace. 
     
     Returns:
-    - database_id (str): the ID of the created database
+    - url (str): the ID of the created database
     """
     database_name = "Imported Booklist"
     notion = Client(auth=notion_key)
@@ -267,8 +272,8 @@ def create_booklist_database(parent_page: str, notion_key:str) -> str:
     args = {"parent":parent, "title":title, "properties":properties}
     #use client and endpoint 
     response = notion.databases.create(**args)
-    #return id 
-    return response['id']
+    #return url
+    return response['url']
 
 def add_booklist_page(book: Book, database_id: str, notion_key: str) -> str: 
     """
@@ -370,20 +375,15 @@ def is_emoji(s: str) -> bool:
 
 def search_notion_id(url:str) -> str: 
     """
-        Searches a url for a notion_id and returns the str if one matches 
+    Searches a URL for a non-segmented, 32-character notion database ID and returns it if found.
     """
-    # Regular expression to extract the Notion page ID
-    regex = r"([a-zA-Z0-9]{32})$"
-    # Search for the pattern in the URL
-    match = re.search(regex, url)
+    regex = r"([a-f0-9]{32})"
+    match = re.search(regex, url, re.IGNORECASE)
 
     if match:
-        page_id = match.group(1)
-        print(f"Notion Page ID: {page_id}")
+        return match.group(1)
     else:
-        page_id = None 
-        print("No Notion Page ID found in the URL.")
-    return page_id 
+        return None
 
 def pdf_to_notion(path:str, parent_page:str, notion_key:str) -> str: 
     """
@@ -395,12 +395,12 @@ def pdf_to_notion(path:str, parent_page:str, notion_key:str) -> str:
     - notion_key (str): the api key for the integration with access to the notion parent page of the new database 
 
     Returns:
-    - id (str): the database id of the notion database containing the inferred information from the booklist. 
+    - url (str): the url of the notion database containing the inferred information from the booklist. 
     """
     # pdf to python list 
     print("Reading through your booklist...")
     booklist = pdf_to_booklist(path)
     # python list to notion 
     print("Creating a Notion page for you...")
-    id = python_to_notion_database(notion_key, booklist, parent_page)
-    return id 
+    url = python_to_notion_database(notion_key, booklist, parent_page)
+    return url

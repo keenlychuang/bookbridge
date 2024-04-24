@@ -22,6 +22,6 @@ Another example:
 1984,George Orwell,False,5,"A dystopian novel that explores the dangers of totalitarianism."
 
 Your output should be the text of the CSV file, starting with the header and ending with the last row of book data.
-Make sure not to include the opening or closing ``` characters. 
+Make sure not to include the opening or closing ``` characters, and don't forget to add the final , character. 
 
 Here is the booklist: 
