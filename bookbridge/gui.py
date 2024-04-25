@@ -3,22 +3,23 @@ from utils import *
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QFileDialog, QLabel, QMessageBox, QTextEdit
 from PyQt5.QtCore import pyqtSignal, QObject
 
-class EmittingStream(QObject):
-    textWritten = pyqtSignal(str)
+# class EmittingStream(QObject):
+#     textWritten = pyqtSignal(str)
 
-    def write(self, text):
-        self.textWritten.emit(str(text))
+#     def write(self, text):
+#         if text:
+#             self.textWritten.emit(str(text))
 
 class MyApp(QWidget):
     def __init__(self):  
         super().__init__()  
         self.initUI()
 
-        # Redirect stdout and stderr
-        self.stdout = sys.stdout
-        self.stderr = sys.stderr
-        sys.stdout = EmittingStream(textWritten=self.onWriteOutput)
-        sys.stderr = EmittingStream(textWritten=self.onWriteOutput)
+        # # Redirect stdout and stderr
+        # self.stdout = sys.stdout
+        # self.stderr = sys.stderr
+        # sys.stdout = EmittingStream(textWritten=self.onWriteOutput)
+        # sys.stderr = EmittingStream(textWritten=self.onWriteOutput)
 
     def initUI(self):
         layout = QVBoxLayout()
@@ -51,10 +52,10 @@ class MyApp(QWidget):
         self.runScriptButton.clicked.connect(self.onRunScriptClicked)
         layout.addWidget(self.runScriptButton)
 
-        # Console Output
-        self.consoleOutput = QTextEdit()
-        self.consoleOutput.setReadOnly(True)
-        layout.addWidget(self.consoleOutput)
+        # # Console Output
+        # self.consoleOutput = QTextEdit()
+        # self.consoleOutput.setReadOnly(True)
+        # layout.addWidget(self.consoleOutput)
 
         self.setLayout(layout)
         self.setWindowTitle('Booklist Import Tool')
@@ -71,11 +72,11 @@ class MyApp(QWidget):
         if fileName:
             self.filePathLabel.setText(fileName)
 
-    # output stream
-    def onWriteOutput(self, text):
-        self.consoleOutput.moveCursor(QTextCursor.End)
-        self.consoleOutput.insertPlainText(text)
-        QApplication.processEvents()
+    # # output stream
+    # def onWriteOutput(self, text):
+    #     self.consoleOutput.moveCursor(QTextCursor.End)
+    #     self.consoleOutput.insertPlainText(text)
+    #     QApplication.processEvents()
 
     # Run 
     def onRunScriptClicked(self): 
@@ -89,8 +90,8 @@ class MyApp(QWidget):
         else:
             QMessageBox.warning(self, "Incomplete Fields", "Please fill in all fields before running the script.")
 
-    def closeEvent(self, event):
-    # Restore sys.stdout and sys.stderr
-        sys.stdout = self.stdout
-        sys.stderr = self.stderr
-        super().closeEvent(event)
+    # def closeEvent(self, event):
+    # # Restore sys.stdout and sys.stderr
+    #     sys.stdout = self.stdout
+    #     sys.stderr = self.stderr
+    #     super().closeEvent(event)

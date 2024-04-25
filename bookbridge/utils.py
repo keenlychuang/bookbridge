@@ -7,7 +7,7 @@ import io
 import os 
 import re
 import unicodedata
-from bookbridge.book import *
+from book import *
 from tqdm import tqdm
 from dotenv import load_dotenv
 from notion_client import Client
@@ -18,7 +18,7 @@ def bookstring_to_csv(bookstring:str, openai_api_key:str)-> str:
     """
     Parses the raw string text from a booklist into a csv format
     """
-    with open('prompts/booklist_to_csv.txt', 'r') as file: 
+    with open('../prompts/booklist_to_csv.txt', 'r') as file: 
         processing_prompt = file.read() 
     prompt_full = processing_prompt + bookstring
     csv_formatted = llm_api_call(prompt_full, openai_api_key)
@@ -150,7 +150,7 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
     # Fill book if not already complete
     book.llm_autofill(openai_api_key)
     # Construct prompt
-    with open('prompts/request_emoji.txt', 'r') as file:
+    with open('../prompts/request_emoji.txt', 'r') as file:
         emoji_prompt = file.read()
     full_prompt = emoji_prompt + book.blurb
 

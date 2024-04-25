@@ -62,14 +62,14 @@ class Book:
         authored, genred, blurbed = False, False, False
         #fill author 
         if self.author is None: 
-            with open('prompts/infer_author.txt', 'r') as file:
+            with open('../prompts/infer_author.txt', 'r') as file:
                 author_prompt = file.read() 
             prompt = author_prompt + f"\n\n{self.title}"
             author_string = llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=light_model)
             self.author = author_string 
         #fill genre 
         if self.genre is None: 
-            with open('prompts/infer_genre.txt', 'r') as file:
+            with open('../prompts/infer_genre.txt', 'r') as file:
                 genre_prompt = file.read() 
             prompt = genre_prompt + f"\n{valid_genres_string}\n\n{self.title}"
             genre_string = llm_api_call(prompt=prompt, openai_api_key= openai_api_key)
@@ -77,7 +77,7 @@ class Book:
             self.genre = genre_string
         #fill blurb 
         if self.blurb is None: 
-            with open('prompts/infer_blurb.txt', 'r') as file:
+            with open('../prompts/infer_blurb.txt', 'r') as file:
                 blurb_prompt = file.read() 
             prompt = blurb_prompt + f"\n\n{self.title}"
             blurb_string =llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=light_model)
