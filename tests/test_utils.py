@@ -46,7 +46,8 @@ def test_update_rating_selection():
 def test_book_autofill(): 
     book = Book("Crime and Punishment")
     expected_author = "Fyodor Dostoevsky"
-    book.llm_autofill() 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    book.llm_autofill(openai_key) 
     assert book.author == expected_author
     assert book.genre in valid_genres
     assert isinstance(book.blurb, str)
@@ -55,7 +56,8 @@ def test_book_autofill():
 @pytest.mark.doc
 def test_llm_api_call():
     prompt = "Your task to return a critique of surveillance captialism and its impact on society."
-    response = llm_api_call(prompt)
+    openai_key = os.getenv('OPENAI_API_KEY')
+    response = llm_api_call(prompt, openai_key)
     print(f"llm api call produced the following test response:\n{response}")
     assert isinstance(response, str)
 
@@ -63,7 +65,8 @@ def test_llm_api_call():
 def test_parse_csv_response():
     with open('data/test/synthetic_booklists/sample.csv', 'r') as file:
         output = file.read()
-    books = parse_csv_response(output)
+    openai_key = os.getenv('OPENAI_API_KEY')
+    books = parse_csv_response(output, openai_key)
     print(books)
     for book in books:
         assert isinstance(book, Book), "failed csv parse, not all books in the booklist are books"
@@ -72,7 +75,8 @@ def test_parse_csv_response():
 def test_bookstring_to_csv(): 
     with open("data/test/synthetic_booklists/sample_booklist_20.txt", 'r') as file: 
         string = file.read() 
-    csv = bookstring_to_csv(string)
+    openai_key = os.getenv('OPENAI_API_KEY')
+    csv = bookstring_to_csv(string, openai_key)
     print(csv)
     assert is_valid_csv(csv)
 
@@ -87,7 +91,8 @@ def test_extract_text_from_pdf():
 @pytest.mark.doc
 def test_pdf_to_bookslist():
     path = "data/test/synthetic_booklists/test_booklist_5.pdf"
-    books = pdf_to_booklist(path)
+    openai_key = os.getenv('OPENAI_API_KEY')
+    books = pdf_to_booklist(path, openai_key)
     assert len(books) == 5
 
 @pytest.mark.integration
@@ -97,7 +102,8 @@ def test_pdf_to_notion_base():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    url = pdf_to_notion(path, test_parent_page_id, notion_key)
+    openai_key = os.getenv('OPENAI_API_KEY')
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, openai_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -108,7 +114,8 @@ def test_pdf_to_notion_10():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    url = pdf_to_notion(path, test_parent_page_id, notion_key)
+    openai_key = os.getenv('OPENAI_API_KEY')
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, openai_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -119,7 +126,8 @@ def test_pdf_to_notion_25():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    url = pdf_to_notion(path, test_parent_page_id, notion_key)
+    openai_key = os.getenv('OPENAI_API_KEY')
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, openai_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -127,7 +135,8 @@ def test_pdf_to_notion_25():
 @pytest.mark.doc
 def test_autofill():
     book = Book("Animal Farm")
-    book.llm_autofill()
+    openai_key = os.getenv('OPENAI_API_KEY')
+    book.llm_autofill(openai_key)
 
     # assert proper formatting on first three fields 
     assert book.title == "Animal Farm"
@@ -148,13 +157,15 @@ def test_pretty_print():
 @pytest.mark.notion 
 def test_python_to_notion_database(): 
     # load example python booklist 
-    booklist = sample_booklist() 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    booklist = sample_booklist(openai_key) 
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     parent_page = os.getenv("PARENT_TEST_PAGE")
     #load up notion client 
     notion = Client(auth=os.getenv('TEST_NOTION_SECRET_KEY'))
     # create database and return id 
-    url = python_to_notion_database(notion_key, booklist, parent_page)
+    openai_key = os.getenv('OPENAI_API_KEY')
+    url = python_to_notion_database(notion_key, booklist, parent_page, openai_key)
     id = search_notion_id(url)
     # print out pages 
     query_response = notion.databases.query(
@@ -165,9 +176,11 @@ def test_python_to_notion_database():
 @pytest.mark.notion 
 def test_infer_emoji(): 
     # load example book 
-    book = sample_book() 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    book = sample_book(openai_key) 
     # infer emoji 
-    emoji = infer_emoji(book)
+    openai_key = os.getenv('OPENAI_API_KEY')
+    emoji = infer_emoji(book, openai_key)
     # assert emoji is acceptable by notion, ie, unicode 
     assert is_emoji(emoji)
 
@@ -187,7 +200,8 @@ def test_create_booklist_database():
 
 @pytest.mark.notion 
 def test_add_booklist_page(): 
-    book = sample_book() 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    book = sample_book(openai_key) 
     key = os.getenv('TEST_NOTION_SECRET_KEY')
     notion = Client(auth=key)
     # assume we have a valid booklist database ID already with properly formatted properties 
@@ -198,7 +212,8 @@ def test_add_booklist_page():
     )
     prev_len = len(query_response['results'])
     # add page 
-    add_booklist_page(book, test_db_id, key)
+    openai_key = os.getenv('OPENAI_API_KEY')
+    add_booklist_page(book, test_db_id, key, openai_key)
     # check number of pages after, assert we added a page 
     query_response = notion.databases.query(
         database_id=os.getenv('TEST_DB_ID')
@@ -207,7 +222,8 @@ def test_add_booklist_page():
 
 @pytest.mark.notion 
 def test_add_booklist_page_new_select(): 
-    book = sample_book() 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    book = sample_book(openai_key) 
     key = os.getenv('TEST_NOTION_SECRET_KEY')
     notion = Client(auth=key)
     # assume we have a valid booklist database ID already with properly formatted properties 
@@ -219,7 +235,8 @@ def test_add_booklist_page_new_select():
     prev_len = len(query_response['results'])
     # add page 
     book.genre = "new-genre"
-    add_booklist_page(book, test_db_id, key)
+    openai_key = os.getenv('OPENAI_API_KEY')
+    add_booklist_page(book, test_db_id, key,openai_key)
     # check number of pages after, assert we added a page 
     query_response = notion.databases.query(
         database_id=os.getenv('TEST_DB_ID')
@@ -229,14 +246,16 @@ def test_add_booklist_page_new_select():
 @pytest.mark.doc
 def test_sample_book(): 
     # call function
-    book = sample_book() 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    book = sample_book(openai_key) 
     # check if its a proper book object 
     assert isinstance(book, Book)
 
 @pytest.mark.doc
 def test_sample_booklist(): 
     # call function
-    booklist = sample_booklist() 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    booklist = sample_booklist(openai_key) 
     # check if each book was autofilled, and each book is indeed a Book 
     for book in booklist: 
         assert book.author is not None

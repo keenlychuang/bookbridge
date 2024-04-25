@@ -48,7 +48,7 @@ class Book:
 
         self.update_rating_selection() 
 
-    def llm_autofill(self) -> str:
+    def llm_autofill(self, openai_api_key) -> str:
         """
         Automatically fills missing fields of the book instance using a language model API.
 
@@ -65,22 +65,22 @@ class Book:
             with open('prompts/infer_author.txt', 'r') as file:
                 author_prompt = file.read() 
             prompt = author_prompt + f"\n\n{self.title}"
-            author_string = llm_api_call(prompt=prompt,model=light_model)
+            author_string = llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=light_model)
             self.author = author_string 
         #fill genre 
         if self.genre is None: 
             with open('prompts/infer_genre.txt', 'r') as file:
                 genre_prompt = file.read() 
             prompt = genre_prompt + f"\n{valid_genres_string}\n\n{self.title}"
-            genre_string = llm_api_call(prompt=prompt, model=light_model)
-            assert genre_string in valid_genres
+            genre_string = llm_api_call(prompt=prompt, openai_api_key= openai_api_key)
+            assert genre_string in valid_genres, f'{genre_string} not valid'
             self.genre = genre_string
         #fill blurb 
         if self.blurb is None: 
             with open('prompts/infer_blurb.txt', 'r') as file:
                 blurb_prompt = file.read() 
             prompt = blurb_prompt + f"\n\n{self.title}"
-            blurb_string =llm_api_call(prompt=prompt, model=light_model)
+            blurb_string =llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=light_model)
             self.blurb = blurb_string
     
     def update_rating_selection(self) -> None: 
@@ -119,7 +119,7 @@ class Book:
             f"    Rating: {self.rating or 'N/A'}\n"
         )
 
-def llm_api_call(prompt: str, max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = "gpt-4-turbo") -> str:
+def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = "gpt-4-turbo") -> str:
     """
     Calls the GPT-4 API using a provided text prompt to generate text.
 
@@ -136,6 +136,7 @@ def llm_api_call(prompt: str, max_tokens: int = 4096, temperature: float = 0.7, 
     """
     load_dotenv() 
     client = OpenAI() 
+    client.api_key = openai_api_key 
     gpt_role_prompt = "You are an AI assistant that can help with a variety of tasks."  
     gpt_user_prompt = prompt
     combined_prompt=[{"role": "assistant", "content": gpt_role_prompt}, {"role": "user", "content": gpt_user_prompt}]
@@ -148,15 +149,15 @@ def llm_api_call(prompt: str, max_tokens: int = 4096, temperature: float = 0.7, 
     string_response = response.choices[0].message.content
     return string_response
 
-def sample_book() -> Book:
+def sample_book(openai_api_key:str) -> Book:
     """
     Returns a sample Book object with non-emoji parameters autofilled 
     """ 
     book = Book("Crime and Punishment")
-    book.llm_autofill() 
+    book.llm_autofill(openai_api_key) 
     return book 
 
-def sample_booklist() -> List: 
+def sample_booklist(openai_api_key:str) -> List: 
     """
     Returns a sample booklist, a python List of Book objects with their non-emoji parameters autofilled 
     """
@@ -167,5 +168,5 @@ def sample_booklist() -> List:
                 Book("Never Finished")
                 ] 
     for book in booklist:
-        book.llm_autofill()
+        book.llm_autofill(openai_api_key)
     return booklist 

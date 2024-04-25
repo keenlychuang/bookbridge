@@ -85,7 +85,7 @@ class MyApp(QWidget):
             doc_path = self.filePathLabel.text() 
             openai_key = self.openaiLineEdit.text() 
             parent_page_id = search_notion_id(parent_page)
-            pdf_to_notion(doc_path, parent_page_id, notion_key)
+            pdf_to_notion(doc_path, parent_page_id, notion_key, openai_key)
         else:
             QMessageBox.warning(self, "Incomplete Fields", "Please fill in all fields before running the script.")
 

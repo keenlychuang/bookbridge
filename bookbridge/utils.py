@@ -14,14 +14,14 @@ from notion_client import Client
 
 load_dotenv() 
 
-def bookstring_to_csv(bookstring:str)-> str: 
+def bookstring_to_csv(bookstring:str, openai_api_key:str)-> str: 
     """
     Parses the raw string text from a booklist into a csv format
     """
     with open('prompts/booklist_to_csv.txt', 'r') as file: 
         processing_prompt = file.read() 
     prompt_full = processing_prompt + bookstring
-    csv_formatted = llm_api_call(prompt_full)
+    csv_formatted = llm_api_call(prompt_full, openai_api_key)
     print("Reformatted booklist...")
     return csv_formatted
 
@@ -48,21 +48,22 @@ def is_valid_csv(csv_string:str):
     
     return True
 
-def pdf_to_booklist(path:str): 
+def pdf_to_booklist(path:str, openai_api_key:str): 
     #pdf to string
     string = extract_text_from_pdf(path)
     #string to csv 
     print("Restructuring your booklist...")
-    csv = bookstring_to_csv(string)
+    csv = bookstring_to_csv(string, openai_api_key)
     try:
         assert is_valid_csv(csv)
     except:
         print(csv)
         raise ValueError("Invalid CSV")
     #parse_response
-    return parse_csv_response(csv)
+    return parse_csv_response(csv, openai_api_key)
 
-def parse_csv_response(response_text: str, autofill:bool = True) -> List[Book]:
+# refactor 
+def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = True) -> List[Book]:
     """
     Parses the response text from an API call into a list of Book instances.
 
@@ -93,7 +94,7 @@ def parse_csv_response(response_text: str, autofill:bool = True) -> List[Book]:
             raise ValueError("Error in parsing CSV formatted str")
     if autofill:
         for book in tqdm(books, "autofilling fields"):
-            book.llm_autofill()
+            book.llm_autofill(openai_api_key)
     return books
 
 def extract_text_from_pdf(pdf_path: str) -> str:
@@ -112,7 +113,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
             text += page.get_text()
     return text
 
-def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page: str): 
+def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page: str, openai_api_key:str): 
     """ 
     Given a list of Books, creates a Notion Database with entries corresponding to each book.
 
@@ -130,11 +131,11 @@ def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page
     database_id = search_notion_id(url)
     # for each book in booklist, add page 
     for book in tqdm(booklist, "converting to notion"):
-        page_id = add_booklist_page(book, database_id, notion_key=notion_key)
+        page_id = add_booklist_page(book, database_id, notion_key=notion_key, openai_api_key= openai_api_key)
     return url
+ 
 
-
-def infer_emoji(book: Book) -> str:
+def infer_emoji(book: Book, openai_api_key:str) -> str:
     """
     Uses an LLM API call to infer an appropriate emoji representing the book
 
@@ -147,7 +148,7 @@ def infer_emoji(book: Book) -> str:
     Attempts the API call up to three times if necessary.
     """
     # Fill book if not already complete
-    book.llm_autofill()
+    book.llm_autofill(openai_api_key)
     # Construct prompt
     with open('prompts/request_emoji.txt', 'r') as file:
         emoji_prompt = file.read()
@@ -159,7 +160,7 @@ def infer_emoji(book: Book) -> str:
     while attempts < max_attempts:
         try:
             # LLM API call
-            response_text = llm_api_call(full_prompt)
+            response_text = llm_api_call(full_prompt, openai_api_key)
             # Quality check
             if is_emoji(response_text):
                 return response_text
@@ -279,7 +280,7 @@ def create_booklist_database(parent_page: str, notion_key:str) -> str:
     #return url
     return response['url']
 
-def add_booklist_page(book: Book, database_id: str, notion_key: str) -> str: 
+def add_booklist_page(book: Book, database_id: str, notion_key: str, openai_api_key:str) -> str: 
     """
     Adds a row to the database representing the booklist in Notion, cooresponding to the supplied Book. 
 
@@ -293,7 +294,7 @@ def add_booklist_page(book: Book, database_id: str, notion_key: str) -> str:
     # create client 
     notion = Client(auth=notion_key)
     parent= {"database_id":database_id}
-    icon = infer_emoji(book)
+    icon = infer_emoji(book, openai_api_key)
     status_name = "Completed" if book.completed else "Not Started"
 
     properties = {
@@ -389,7 +390,7 @@ def search_notion_id(url:str) -> str:
     else:
         return None
 
-def pdf_to_notion(path:str, parent_page:str, notion_key:str) -> str: 
+def pdf_to_notion(path:str, parent_page:str, notion_key:str, openai_api_key:str) -> str: 
     """
     Given the str path to a pdf containing a booklist, attempt to convert the booklist to a new notion database and return the database id. 
 
@@ -403,8 +404,8 @@ def pdf_to_notion(path:str, parent_page:str, notion_key:str) -> str:
     """
     # pdf to python list 
     print("Reading through your booklist...")
-    booklist = pdf_to_booklist(path)
+    booklist = pdf_to_booklist(path, openai_api_key)
     # python list to notion 
     print("Creating a Notion page for you...")
-    url = python_to_notion_database(notion_key, booklist, parent_page)
+    url = python_to_notion_database(notion_key, booklist, parent_page, openai_api_key)
     return url
