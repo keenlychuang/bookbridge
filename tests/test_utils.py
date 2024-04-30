@@ -7,6 +7,12 @@ from bookbridge.utils import *
 from bookbridge.book import * 
 from notion_client import Client
 
+
+'''
+Most tests require the same Notion API key, Parent Page, and OpenAI Key as the GUI, and instead use variables in the .env file. 
+You can find an example formatted file in .example.env
+'''
+
 load_dotenv() 
 test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
 
