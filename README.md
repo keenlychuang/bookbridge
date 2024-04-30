@@ -42,11 +42,13 @@ To use BookBridge to import your booklist into a Notion database, follow these s
 
 1. Obtain an integration token from Notion by creating a new integration.
 2. Obtain an API key from OpenAI to use LLMs. This iteration uses `gpt-4-turbo`. 
-3. Obtain the URL of the Notion page you want to import the booklist into. If you're new to Notion, the [https://www.notion.so/help/category/new-to-notion](getting started) page is a good place to begin. 
-3. Run the tool using the command:
+3. Obtain the URL of the Notion page you want to import the booklist into. If you're new to Notion, the [getting started](https://www.notion.so/help/category/new-to-notion) page is a good place to begin.
+4. Run the tool using the command:
    ```
    python bookbridge.py
    ```
+5. Input the required information in the interface and click "Run Script". If you entered the information correctly, you should see a new database under the page you specified in a few seconds! 
+
 
 ## Contributing
 
