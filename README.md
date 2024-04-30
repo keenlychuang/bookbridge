@@ -10,21 +10,65 @@ Transform your old booklists into a dynamic Notion database with the Booklist Im
 
 ## Background and Overview
 
-As an avid reader, I've accumulated a substantial list of books over the years, categorizing them by what I wanted to read, what I had completed, and the type of books they are. With an intention to share my reading journey more publicly and to organize my collection with greater sophistication, I've chosen Notion as the platform for its unparalleled ability to present, store, and share information.
+As an avid reader, I've accumulated a substantial list of books over the years, categorizing them by what I wanted to read, what I had completed, and the type of books they are. With an intention to share my reading journey more publicly and to organize my collection with greater sophistication, I've chosen Notion as the platform for its unparalleled ability to present, store, and share information. On top of being a pleasure to look at, Notion pages are easy to share, publish, modify, and update, and has robust API support for people with more technical inclination. Not sponsored, btw. 
 
-This project serves multiple purposes:
-- **Organization:** To transition from old lists to a more flexible and informative medium.
-- **Learning:** To gain hands-on experience with LLM APIs and software engineering practices.
-- **Sharing:** To create a space that not only allows me to share my reading list with friends but also provides a template for others to create their own.
+## Installation
 
-## Project Goals
+To get started with BookBridge, follow these simple installation instructions.
 
-1. **Data Transfer:** Successfully import the old booklist into Notion, enabling the deletion of old pages and categorization of books by attributes such as author, fiction/non-fiction status, genre, completion status, recommendations, ratings, blurbs, and personal notes.
+### Prerequisites
 
-2. **Engineering Learning:** Dive deep into the workings of APIs, specifications, testing, and implementation phases of software development.
+- Python 3.7 or higher
+- Pip (Python package installer)
 
-3. **Sharability:** Create a subspace within my workspace to share with friends and develop shareable code/scripts for broader use.
+### Steps
 
-## Installation (Under Construction)
+1. Clone this repository to your local machine using:
+   ```
+   git clone https://github.com/yourusername/bookbridge.git
+   ```
+2. Navigate to the cloned directory:
+   ```
+   cd bookbridge
+   ```
+3. Install the required dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
 
-## Screenshots (Under Construction)
+## Usage
+
+To use BookBridge to import your booklist into a Notion database, follow these steps:
+
+1. Obtain an integration token from Notion by creating a new integration.
+2. Obtain an API key from OpenAI to use LLMs. This iteration uses `gpt-4-turbo`. 
+3. Obtain the URL of the Notion page you want to import the booklist into. If you're new to Notion, the [https://www.notion.so/help/category/new-to-notion](getting started) page is a good place to begin. 
+3. Run the tool using the command:
+   ```
+   python bookbridge.py
+   ```
+
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## Contact
+
+K. Simon Chuang - keenlyschuang@gmail.com
+
+Project Link: [https://github.com/keenlychuang/bookbridge](https://github.com/keenlychuang/bookbridge)
+
+## Acknowledgements
+
+- [Notion API](https://developers.notion.com/)
+- [Your other dependencies or resources]
