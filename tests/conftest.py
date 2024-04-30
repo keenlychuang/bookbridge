@@ -5,3 +5,4 @@ import pytest
 def change_test_dir(request):
     """Change current working directory to project root."""
     os.chdir(request.config.rootdir)
+    print('Working Changed Directory')

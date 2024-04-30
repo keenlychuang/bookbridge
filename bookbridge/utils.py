@@ -17,7 +17,7 @@ from pathlib import Path
 # Assuming this script is in the package root (next to prompts/)
 current_file_path = Path(__file__).resolve()
 package_root = current_file_path.parent  # This is the 'bookbridge/bookbridge/' directory
-prompts_path = package_root / "prompts"
+prompts_path = package_root / "prompts"    
 
 load_dotenv() 
 
@@ -25,7 +25,7 @@ def bookstring_to_csv(bookstring:str, openai_api_key:str)-> str:
     """
     Parses the raw string text from a booklist into a csv format
     """
-    with open('prompts/booklist_to_csv.txt', 'r') as file: 
+    with open(prompts_path / 'booklist_to_csv.txt', 'r') as file: 
         processing_prompt = file.read() 
     prompt_full = processing_prompt + bookstring
     csv_formatted = llm_api_call(prompt_full, openai_api_key)
@@ -157,7 +157,7 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
     # Fill book if not already complete
     book.llm_autofill(openai_api_key)
     # Construct prompt
-    with open('prompts/request_emoji.txt', 'r') as file:
+    with open(prompts_path/ 'request_emoji.txt', 'r') as file:
         emoji_prompt = file.read()
     full_prompt = emoji_prompt + book.blurb
 

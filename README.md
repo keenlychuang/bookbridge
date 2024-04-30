@@ -31,6 +31,50 @@ To get started with BookBridge, follow these simple installation instructions.
    ```
    cd bookbridge
    ```
+3. Create a virtual environment in the current directory by running:
+   ```
+   # For macOS and Linux:
+   python3 -m venv venv
+
+   # For Windows:
+   python -m venv venv
+   ```
+   This will create a new directory named `venv` in your project directory, containing the virtual environment. It's a good practice to use a virtual environment for Python projects to manage dependencies separately for each project and avoid conflicts between project requirements.
+
+4. Activate the virtual environment:
+   ```
+   # For macOS and Linux:
+   source venv/bin/activate
+
+   # For Windows:
+   .\venv\Scripts\activate
+   ```
+   Once activated, your terminal should show the name of the virtual environment (in this case, `venv`), indicating that any Python or pip commands will now use the virtual environment's Python interpreter and installed packages.
+
+5. It's a good practice to ensure that pip, setuptools, and wheel are up to date within the virtual environment:
+   ```
+   pip install --upgrade pip setuptools wheel
+   ```
+
+6. Install the required dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+   This will install all the necessary packages specified in the `requirements.txt` file into the virtual environment.
+
+By following these steps, users will set up a virtual environment for the project, ensuring that all dependencies are installed l
+
+
+1. Clone this repository to your local machine using:
+   ```
+   git clone https://github.com/yourusername/bookbridge.git
+   ```
+2. Navigate to the cloned directory:
+   ```
+   cd bookbridge
+   ```
+- upgrade pip if you haven't already 
+
 3. Install the required dependencies:
    ```
    pip install -r requirements.txt
@@ -40,7 +84,7 @@ To get started with BookBridge, follow these simple installation instructions.
 
 To use BookBridge to import your booklist into a Notion database, follow these steps:
 
-1. Obtain an integration token from Notion by creating a new integration.
+1. Obtain an integration token from Notion by creating a new integration. Make sure your Notion page has given access to the integration. 
 2. Obtain an API key from OpenAI to use LLMs. This iteration uses `gpt-4-turbo`. 
 3. Obtain the URL of the Notion page you want to import the booklist into. If you're new to Notion, the [getting started](https://www.notion.so/help/category/new-to-notion) page is a good place to begin.
 4. Run the tool using the command:
