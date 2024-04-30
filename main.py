@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QApplication
 import sys
 
 # If gui.py is in the same package, adjust the import statement accordingly
-from gui import MyApp
+from bookbridge.gui import MyApp
 
 def main():
     # Create an instance of QApplication before the QApplication window

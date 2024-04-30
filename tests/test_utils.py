@@ -25,7 +25,6 @@ def test_book_initialization():
     assert book.completed is True
     assert book.blurb == "Sample blurb"
     assert book.rating == 4
-    return book 
     # assert book.notes == "Sample notes"
 
 @pytest.mark.book
