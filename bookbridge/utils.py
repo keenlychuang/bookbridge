@@ -7,7 +7,7 @@ import io
 import os 
 import re
 import unicodedata
-from book import *
+from bookbridge.book import *
 from tqdm import tqdm
 from dotenv import load_dotenv
 from notion_client import Client

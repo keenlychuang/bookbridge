@@ -4,3 +4,4 @@ __pycache__/
 .vscode/
 data/user
 debugging.ipynb
+venv/
