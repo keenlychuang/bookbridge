@@ -49,7 +49,7 @@ class Book:
         self.rating_selection = "Not Rated"
 
         #TODO: Extra features 
-        self.recs=[recommender for recommender in recs]
+        self.recs=[recommender for recommender in recs] if recs != None else [] 
         self.emoji = None 
         self.notes = None
 
@@ -164,7 +164,7 @@ def sample_book(openai_api_key:str) -> Book:
     """ 
     book = Book("Crime and Punishment")
     book.llm_autofill(openai_api_key) 
-    book.recs.add("Johnny")
+    book.recs.append("Johnny")
     return book 
 
 def sample_booklist(openai_api_key:str) -> List: 

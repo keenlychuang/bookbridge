@@ -86,7 +86,7 @@ def test_parse_csv_recs_response():
     print(books)
     for book in books:
         assert isinstance(book, Book), "failed csv parse, not all books in the booklist are books"
-        assert isEmpty(book.recs), "failed csv parse, book should have recommender"
+        assert len(book.recs)!=0, "failed csv parse, book should have recommender"
 
 @pytest.mark.doc
 def test_bookstring_to_csv(): 

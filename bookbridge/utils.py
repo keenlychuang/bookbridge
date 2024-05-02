@@ -98,6 +98,7 @@ def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = T
             genre = None 
             # unpacking recs 
             recs = recs.split("/")
+            recs = list(filter(lambda recommendation: True if recommendation != '' else False, recs))
             book = Book(title, author, genre, completed, blurb, rating, recs) 
             books.append(book)
         except: 
@@ -163,11 +164,12 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
     # Construct prompt
     with open(prompts_path/ 'request_emoji.txt', 'r') as file:
         emoji_prompt = file.read()
-    full_prompt = emoji_prompt + book.blurb
+    book_name = f'Book Name: {book.title}\n'
+    full_prompt = emoji_prompt + book_name + book.blurb
 
     max_attempts = 2
     attempts = 0
-    
+
     while attempts < max_attempts:
         try:
             # LLM API call
@@ -263,12 +265,12 @@ def create_booklist_database(parent_page: str, notion_key:str) -> str:
                 }
             },
             "Recommended By": {
-                "type": "select",
-                "select": {}
+                "type": "multi_select",
+                "multi_select": {}
             },
             "Want To Read": {
                 "type": "multi_select", 
-                "multi_select": {} 
+                "multi_select": {}
             }          
     }
     properties["Genre"] = {
@@ -330,11 +332,15 @@ def add_booklist_page(book: Book, database_id: str, notion_key: str, openai_api_
         'Genre': {
             "select": {"name":book.genre.replace('-', ' ').title()}
         },
-        # TODO
-        'Recommended By': {
-            "select": {} 
-        },
     }
+
+    print(book.recs)
+    if book.recs:
+        properties['Recommended By'] = {
+            "multi_select": [{"name": recommender} for recommender in book.recs]
+        }
+    print(properties)
+
     children = [
         {
             "object": "block",
