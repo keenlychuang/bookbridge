@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from importlib import resources
 from pathlib import Path
+from enum import Enum
 
 # Assuming this script is in the package root (next to prompts/)
 current_file_path = Path(__file__).resolve()
@@ -23,9 +24,32 @@ Genre = Literal[
                 ]
 valid_genres_string = str(valid_genres)
 
+# Enum for possible states of book completion, for readability 
+class BookStatus(Enum):
+    NOT_STARTED = 0
+    IN_PROGRESS = 1
+    COMPLETED = 2
+
+    @staticmethod
+    # convert valid int to corresponding book status 
+    def from_int(value):
+        for status in BookStatus:
+            if status.value == value:
+                return status
+        raise ValueError(f"No corresponding BookStatus found for value: {value}")
+
+    def __str__(self):
+        if self == BookStatus.NOT_STARTED:
+            return "Not Started"
+        elif self == BookStatus.IN_PROGRESS:
+            return "In Progress"
+        elif self == BookStatus.COMPLETED:
+            return "Completed"
+        else:
+            return "Unknown Status"
 
 class Book:
-    def __init__(self, title: str, author: str = None, genre: Optional[Genre] = None, completed: bool = False, blurb: str = None, rating: float = None, recs:List=None):
+    def __init__(self, title: str, author: str = None, genre: Optional[Genre] = None, status: BookStatus = BookStatus.NOT_STARTED, blurb: str = None, rating: float = None, recs:List=None):
         """
         Initializes a new Book instance.
 
@@ -33,7 +57,7 @@ class Book:
         - title (str): The title of the book.
         - author (str, optional): The author of the book. Default is None.
         - genre (Optional[Genre], optional): The genre of the book from a predefined set. Default is None.
-        - completed (bool, optional): Flag indicating if the book has been read. Default is False.
+        - status (bool, optional): Flag indicating if the book has been read. Default is False.
         - blurb (str, optional): A short description or blurb of the book. Default is None.
         - rating (float, optional): The personal rating given to the book, on a five point scale. Default is None.
         # - notes (str, optional): Additional notes or comments about the book. Default is None.
@@ -44,14 +68,12 @@ class Book:
         self.genre = genre
         self.blurb = blurb
         #TODO: Including "inprogress" for status 
-        self.completed = completed
+        self.status = status
         self.rating = round(rating) if rating is not None else None 
         self.rating_selection = "Not Rated"
-
-        #TODO: Extra features 
         self.recs=[recommender for recommender in recs] if recs != None else [] 
         self.emoji = None 
-        self.notes = None
+        # self.notes = None
 
         self.update_rating_selection() 
 
@@ -115,14 +137,13 @@ class Book:
         Returns:
         str: A string detailing the book's title, author, other attributes, and recommenders.
         """
-        completed_str = "Yes" if self.completed else "No"
         # Convert the list of recommenders to a string, handling the case where it might be None or empty
         recommenders_str = ", ".join(self.recs) if self.recs else "N/A"
         return (
             f"Title: {self.title}\n"
             f"    Author: {self.author or 'N/A'}\n"
             f"    Genre: {self.genre or 'N/A'}\n"
-            f"    Completed: {completed_str}\n"
+            f"    Status: {self.status}\n"
             f"    Blurb: {self.blurb or 'N/A'}\n"
             f"    Rating: {self.rating or 'N/A'}\n"
             f"    Recommenders: {recommenders_str}\n"

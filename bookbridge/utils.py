@@ -88,15 +88,15 @@ def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = T
     next(reader,None)
     for row in tqdm(reader, "Processing Rows"):
         try: 
-            title, author, completed, rating, blurb,recs = row  # Unpacking row values
-            # Convert 'completed' to boolean, 'rating' to float if present
-            completed = completed == "True"
+            title, author, status, rating, blurb,recs = row  # Unpacking row values
+            # chagne from status string. Expecting status as 0,1,2
+            status = BookStatus.from_int(int(status))
             rating = float(rating) if rating else None  
             genre = None 
             # unpacking recs 
             recs = recs.split("/")
             recs = list(filter(lambda recommendation: True if recommendation != '' else False, recs))
-            book = Book(title, author, genre, completed, blurb, rating, recs) 
+            book = Book(title, author, genre, status, blurb, rating, recs) 
             books.append(book)
         except: 
             print(row)
@@ -304,7 +304,7 @@ def add_booklist_page(book: Book, database_id: str, notion_key: str, openai_api_
     notion = Client(auth=notion_key)
     parent= {"database_id":database_id}
     icon = infer_emoji(book, openai_api_key)
-    status_name = "Completed" if book.completed else "Not Started"
+    status_name = str(book.status)
 
     properties = {
         'Title': {

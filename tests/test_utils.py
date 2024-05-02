@@ -2,6 +2,7 @@ import requests
 import pytest
 import asyncio
 import os 
+from enum import Enum
 from typing import Literal, Optional 
 from bookbridge.utils import *
 from bookbridge.book import * 
@@ -18,11 +19,11 @@ test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
 
 @pytest.mark.book
 def test_book_initialization():
-    book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5, ['Simon', 'Steve'])
+    book = Book("Sample Title", "Author Name", "fiction", BookStatus.NOT_STARTED, "Sample blurb", 4.5, ['Simon', 'Steve'])
     assert book.title == "Sample Title"
     assert book.author == "Author Name"
     assert book.genre in valid_genres
-    assert book.completed is True
+    assert book.status == BookStatus.NOT_STARTED
     assert book.blurb == "Sample blurb"
     assert book.rating == 4
     assert book.recs == ['Simon', 'Steve']
@@ -172,7 +173,7 @@ def test_autofill():
     assert book.title == "Animal Farm"
     assert book.author == "George Orwell"
     assert book.genre in valid_genres
-    assert book.completed is not None
+    assert book.status is not None
 
     # doesn't matter which blurb, should not complete other fields
     assert book.blurb is not None
