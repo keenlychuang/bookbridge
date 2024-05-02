@@ -18,13 +18,14 @@ test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
 
 @pytest.mark.book
 def test_book_initialization():
-    book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5)
+    book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5, ['Simon', 'Steve'])
     assert book.title == "Sample Title"
     assert book.author == "Author Name"
     assert book.genre in valid_genres
     assert book.completed is True
     assert book.blurb == "Sample blurb"
     assert book.rating == 4
+    assert book.recs == ['Simon', 'Steve']
     # assert book.notes == "Sample notes"
 
 @pytest.mark.book
@@ -76,6 +77,17 @@ def test_parse_csv_response():
     for book in books:
         assert isinstance(book, Book), "failed csv parse, not all books in the booklist are books"
 
+@pytest.mark.recs
+def test_parse_csv_recs_response():
+    with open('data/test/synthetic_booklists/sample_with_recs.csv', 'r') as file:
+        output = file.read()
+    openai_key = os.getenv('OPENAI_API_KEY')
+    books = parse_csv_response(output, openai_key)
+    print(books)
+    for book in books:
+        assert isinstance(book, Book), "failed csv parse, not all books in the booklist are books"
+        assert isEmpty(book.recs), "failed csv parse, book should have recommender"
+
 @pytest.mark.doc
 def test_bookstring_to_csv(): 
     with open("data/test/synthetic_booklists/sample_booklist_20.txt", 'r') as file: 
@@ -104,6 +116,19 @@ def test_pdf_to_bookslist():
 def test_pdf_to_notion_base():
     # sample path to pdf, notion key, and parent page 
     path = "data/test/synthetic_booklists/test_booklist_5.pdf"
+    notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
+    test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
+    # function call 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, openai_key)
+    # go check that the page actually contains a good booklist 
+    print(f"Go Check Out Your New Page: {url}")
+
+@pytest.mark.integration
+@pytest.mark.recs 
+def test_pdf_to_notion_recs_5(): 
+    # sample path to pdf, notion key, and parent page 
+    path = "data/test/synthetic_booklists/recs_5.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
@@ -156,7 +181,7 @@ def test_autofill():
 
 @pytest.mark.doc
 def test_pretty_print():
-    book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5)
+    book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5, ['Joey', 'Tristan', 'Yugi', 'Kuriboh'])
     print(book)
 
 @pytest.mark.notion 

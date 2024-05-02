@@ -113,10 +113,11 @@ class Book:
         Provides a formatted string representation of the book instance.
 
         Returns:
-        str: A string detailing the book's title, author, and other attributes.
-
+        str: A string detailing the book's title, author, other attributes, and recommenders.
         """
         completed_str = "Yes" if self.completed else "No"
+        # Convert the list of recommenders to a string, handling the case where it might be None or empty
+        recommenders_str = ", ".join(self.recs) if self.recs else "N/A"
         return (
             f"Title: {self.title}\n"
             f"    Author: {self.author or 'N/A'}\n"
@@ -124,6 +125,7 @@ class Book:
             f"    Completed: {completed_str}\n"
             f"    Blurb: {self.blurb or 'N/A'}\n"
             f"    Rating: {self.rating or 'N/A'}\n"
+            f"    Recommenders: {recommenders_str}\n"
         )
 
 def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = "gpt-4-turbo") -> str:
