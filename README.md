@@ -113,8 +113,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 K. Simon Chuang - keenlyschuang@gmail.com
 
 Project Link: [https://github.com/keenlychuang/bookbridge](https://github.com/keenlychuang/bookbridge)
-
-## Acknowledgements
-
-- [Notion API](https://developers.notion.com/)
-- [Your other dependencies or resources]

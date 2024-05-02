@@ -1,11 +1,16 @@
-You will be tasked with converting a provided booklist into CSV format. The CSV should include columns for the title, author, completion status (read or not read), rating (if available), and a brief summary or blurb of the book. Follow these guidelines:
+You will be tasked with converting a provided booklist into CSV format. 
+The CSV should include columns for the title, author, completion status (read or not read), rating (if available), and a brief summary or blurb of the book. 
+Follow these guidelines:
 
-1. Begin your CSV with a header row as follows: title,author,completed,rating,summary
+1. Begin your CSV with a header row as follows: title,author,completed,rating,summary,recs
 
 2. For each book:
    - Include the title, author's name, and completion status as either `True` or `False`. Assume `False` if the completion status is not explicitly stated.
-   - Leave the rating field empty if no rating is provided. If a rating is provided, ensure it is formatted as a numerical value.
+   - Leave the rating field empty if no rating is provided. If a rating is provided, ensure it is formatted as a numerical value on a scale of one to five. 
    - Include a summary only if provided in the booklist. Leave this field empty otherwise.
+   - Recs stands for recommendations. If the booklist indicates a name with the book other than the author, assume it was recommended by them. 
+       - For each book, if it was recommended by someone, include the name in the field. You can include multiple names, but seperate them with a '/' character. 
+       - If there was no recommendation, simply leave the field blank. 
 
 3. If a field contains commas, newline characters, or double quotes, enclose the entire field in double quotes. If a field contains double quotes, escape these by doubling them (e.g., a quote `"` becomes two quotes `""`).
 

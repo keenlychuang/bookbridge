@@ -25,7 +25,7 @@ valid_genres_string = str(valid_genres)
 
 
 class Book:
-    def __init__(self, title: str, author: str = None, genre: Optional[Genre] = None, completed: bool = False, blurb: str = None, rating: float = None):
+    def __init__(self, title: str, author: str = None, genre: Optional[Genre] = None, completed: bool = False, blurb: str = None, rating: float = None, recs:List=None):
         """
         Initializes a new Book instance.
 
@@ -48,8 +48,8 @@ class Book:
         self.rating = round(rating) if rating is not None else None 
         self.rating_selection = "Not Rated"
 
-        #TODO Non-essential properties 
-        self.rec_by = None 
+        #TODO: Extra features 
+        self.recs=[recommender for recommender in recs]
         self.emoji = None 
         self.notes = None
 
@@ -162,6 +162,7 @@ def sample_book(openai_api_key:str) -> Book:
     """ 
     book = Book("Crime and Punishment")
     book.llm_autofill(openai_api_key) 
+    book.recs.add("Johnny")
     return book 
 
 def sample_booklist(openai_api_key:str) -> List: 

@@ -21,6 +21,7 @@ prompts_path = package_root / "prompts"
 
 load_dotenv() 
 
+#TODO Add Reccs 
 def bookstring_to_csv(bookstring:str, openai_api_key:str)-> str: 
     """
     Parses the raw string text from a booklist into a csv format
@@ -55,6 +56,7 @@ def is_valid_csv(csv_string:str):
     
     return True
 
+#TODO Add reccs 
 def pdf_to_booklist(path:str, openai_api_key:str): 
     #pdf to string
     string = extract_text_from_pdf(path)
@@ -69,7 +71,7 @@ def pdf_to_booklist(path:str, openai_api_key:str):
     #parse_response
     return parse_csv_response(csv, openai_api_key)
 
-# refactor 
+# TODO: Add Reccs 
 def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = True) -> List[Book]:
     """
     Parses the response text from an API call into a list of Book instances.
@@ -89,12 +91,14 @@ def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = T
     next(reader,None)
     for row in tqdm(reader, "Processing Rows"):
         try: 
-            title, author, completed, rating, blurb = row  # Unpacking row values
+            title, author, completed, rating, blurb,recs = row  # Unpacking row values
             # Convert 'completed' to boolean, 'rating' to float if present
             completed = completed == "True"
             rating = float(rating) if rating else None  
             genre = None 
-            book = Book(title, author, genre, completed, blurb, rating) 
+            # unpacking recs 
+            recs = recs.split("/")
+            book = Book(title, author, genre, completed, blurb, rating, recs) 
             books.append(book)
         except: 
             print(row)
@@ -180,7 +184,6 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
 
     print(response_text)
     raise ValueError("Failed to infer an emoji after maximum attempts.")
-
 
 def create_booklist_database(parent_page: str, notion_key:str) -> str:
     """
@@ -287,6 +290,7 @@ def create_booklist_database(parent_page: str, notion_key:str) -> str:
     #return url
     return response['url']
 
+# TODO: Add Reccs 
 def add_booklist_page(book: Book, database_id: str, notion_key: str, openai_api_key:str) -> str: 
     """
     Adds a row to the database representing the booklist in Notion, cooresponding to the supplied Book. 
@@ -310,7 +314,6 @@ def add_booklist_page(book: Book, database_id: str, notion_key: str, openai_api_
                 {"text": {"content": book.title}}
             ]
         },
-        #TODO, pick rating 
         'Rating': {
             "select": {
                 "name":book.rating_selection
@@ -326,6 +329,10 @@ def add_booklist_page(book: Book, database_id: str, notion_key: str, openai_api_
         },
         'Genre': {
             "select": {"name":book.genre.replace('-', ' ').title()}
+        },
+        # TODO
+        'Recommended By': {
+            "select": {} 
         },
     }
     children = [
