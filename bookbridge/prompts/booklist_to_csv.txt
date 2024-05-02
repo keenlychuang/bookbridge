@@ -3,6 +3,7 @@ The CSV should include columns for the title, author, completion status (read or
 Follow these guidelines:
 
 1. Begin your CSV with a header row as follows: title,author,completed,rating,summary,recs
+   - Ensure each line in the csv has the proper amount of commas seperating each value. 
 
 2. For each book:
    - Include the title, author's name, and completion status as either `True` or `False`. Assume `False` if the completion status is not explicitly stated.

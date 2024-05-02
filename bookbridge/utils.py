@@ -21,7 +21,6 @@ prompts_path = package_root / "prompts"
 
 load_dotenv() 
 
-#TODO Add Reccs 
 def bookstring_to_csv(bookstring:str, openai_api_key:str)-> str: 
     """
     Parses the raw string text from a booklist into a csv format
@@ -56,7 +55,6 @@ def is_valid_csv(csv_string:str):
     
     return True
 
-#TODO Add reccs 
 def pdf_to_booklist(path:str, openai_api_key:str): 
     #pdf to string
     string = extract_text_from_pdf(path)
@@ -71,7 +69,6 @@ def pdf_to_booklist(path:str, openai_api_key:str):
     #parse_response
     return parse_csv_response(csv, openai_api_key)
 
-# TODO: Add Reccs 
 def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = True) -> List[Book]:
     """
     Parses the response text from an API call into a list of Book instances.
@@ -292,7 +289,6 @@ def create_booklist_database(parent_page: str, notion_key:str) -> str:
     #return url
     return response['url']
 
-# TODO: Add Reccs 
 def add_booklist_page(book: Book, database_id: str, notion_key: str, openai_api_key:str) -> str: 
     """
     Adds a row to the database representing the booklist in Notion, cooresponding to the supplied Book. 
