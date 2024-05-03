@@ -293,18 +293,17 @@ def test_sample_booklist():
 
 @pytest.mark.doc
 def test_valid_emoji(): 
-    test_strings = ['\ud83d\ude00', '\ud83d\ude80', 'Hello, world!', '\ud83d\udc4d\ud83d\udc4e']
+    test_strings = ['🧛🏿', '✊🏼', 'Hello, world!', '\ud83d\udc4d\ud83d\udc4e', '👁️‍🗨️👁️‍🗨️']
     results = [valid_emoji(candidate) for candidate in test_strings]
-    assert results == [True, True, False, True]
+    assert results == [True, True, False, False, False]
 
 @pytest.mark.doc 
-@pytest.mark.skip
 def test_extract_emojis():
     with open('data/valid_emojis_notion.txt', 'r') as file:
         output = file.read()
-    mapping = extract_emojis(output) 
-    print(mapping.keys())
-    for emoji in mapping.keys(): 
+    set = extract_emojis(output) 
+    print(set)
+    for emoji in set: 
         assert valid_emoji(emoji)
 
 @pytest.mark.doc
