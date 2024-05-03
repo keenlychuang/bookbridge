@@ -151,7 +151,6 @@ def test_pdf_to_notion_10():
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.integration 
-@pytest.mark.skip
 def test_pdf_to_notion_25(): 
     path = "data/test/synthetic_booklists/test_booklist_25.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
