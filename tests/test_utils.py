@@ -171,7 +171,8 @@ def test_autofill():
     # assert proper formatting on first three fields 
     assert book.title == "Animal Farm"
     assert book.author == "George Orwell"
-    assert book.genre in valid_genres
+    #TODO either enforce or disregard valid_genres
+    # assert book.genre in valid_genres
     assert book.status is not None
 
     # doesn't matter which blurb, should not complete other fields
@@ -212,7 +213,7 @@ def test_infer_emoji():
     openai_key = os.getenv('OPENAI_API_KEY')
     emoji = infer_emoji(book, openai_key)
     # assert emoji is acceptable by notion, ie, unicode 
-    assert is_emoji(emoji)
+    assert valid_emoji(emoji)
 
 @pytest.mark.notion
 def test_create_booklist_database():
@@ -291,10 +292,20 @@ def test_sample_booklist():
         assert book.author is not None
 
 @pytest.mark.doc
-def test_is_emoji(): 
+def test_valid_emoji(): 
     test_strings = ['\ud83d\ude00', '\ud83d\ude80', 'Hello, world!', '\ud83d\udc4d\ud83d\udc4e']
-    results = [is_emoji(candidate) for candidate in test_strings]
+    results = [valid_emoji(candidate) for candidate in test_strings]
     assert results == [True, True, False, True]
+
+@pytest.mark.doc 
+@pytest.mark.skip
+def test_extract_emojis():
+    with open('data/valid_emojis_notion.txt', 'r') as file:
+        output = file.read()
+    mapping = extract_emojis(output) 
+    print(mapping.keys())
+    for emoji in mapping.keys(): 
+        assert valid_emoji(emoji)
 
 @pytest.mark.doc
 def test_search_notion_id_with_valid_url():

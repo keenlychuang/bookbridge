@@ -172,7 +172,7 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
             # LLM API call
             response_text = llm_api_call(full_prompt, openai_api_key)
             # Quality check
-            if is_emoji(response_text):
+            if valid_emoji(response_text):
                 return response_text
             else:
                 attempts += 1
@@ -370,7 +370,9 @@ def add_booklist_page(book: Book, database_id: str, notion_key: str, openai_api_
     response = notion.pages.create(**args)
     return response["id"]
 
-def is_emoji(s: str) -> bool:
+
+#TODO: only single emoji, check from api generated txt 
+def valid_emoji(s: str) -> bool:
     """
     Determines if the string s contains at least one valid emoji.
     """
@@ -405,6 +407,18 @@ def search_notion_id(url:str) -> str:
         return match.group(1)
     else:
         return None
+
+def extract_emojis(notion_valid_emojis:str) -> dict: 
+    """
+    Returns a mapping of valid emojis based on the emojis returned by notion API
+    """ 
+    # Define a regex pattern to match emojis encased in double quotes or backticks.
+    # This example uses a wide range of Unicode blocks to match common emojis, but it is not exhaustive.
+    emoji_pattern = r'["`]([\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F700-\U0001F77F\U0001F780-\U0001F7FF\U0001F800-\U0001F8FF\U0001F900-\U0001F9FF\U0001FA00-\U0001FA6F\U0001FA70-\U0001FAFF\U00002702-\U000027B0\U000024C2-\U0001F251]+)["`]'
+
+    matches = re.findall(emoji_pattern, text)
+
+    raise NotImplementedError
 
 def pdf_to_notion(path:str, parent_page:str, notion_key:str, openai_api_key:str) -> str: 
     """

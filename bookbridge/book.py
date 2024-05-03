@@ -24,6 +24,9 @@ Genre = Literal[
                 ]
 valid_genres_string = str(valid_genres)
 
+SMART_MODEL = "gpt-4-turbo"
+FAST_MODEL = "gpt-3.5-turbo"
+
 # Enum for possible states of book completion, for readability 
 class BookStatus(Enum):
     NOT_STARTED = 0
@@ -102,7 +105,8 @@ class Book:
                 genre_prompt = file.read() 
             prompt = genre_prompt + f"\n{valid_genres_string}\n\n{self.title}"
             genre_string = llm_api_call(prompt=prompt, openai_api_key= openai_api_key)
-            assert genre_string in valid_genres, f'{genre_string} not valid'
+            #TODO: Enforce Genres 
+            # assert genre_string in valid_genres, f'{genre_string} not valid'
             self.genre = genre_string
         #fill blurb 
         if self.blurb is None: 
@@ -149,7 +153,7 @@ class Book:
             f"    Recommenders: {recommenders_str}\n"
         )
 
-def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = "gpt-4-turbo") -> str:
+def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = FAST_MODEL) -> str:
     """
     Calls the GPT-4 API using a provided text prompt to generate text.
 

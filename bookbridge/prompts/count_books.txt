@@ -1,1 +1,8 @@
-I have a list of books that I need to organize. For each book, information such as the title, author, completion status, rating, a brief summary, and recommendations may or may not be provided. Your task is to accurately count the number of books in the list. Consider a new book entry to start whenever you encounter a book title. Please provide the total count of books in the list.
+Given a list of books where each book's information starts with a title, count how many books are in the list. 
+Each book may have details such as the author, completion status, rating, summary, and recommendations, but you should recognize a new book entry by the appearance of a new title. 
+Output the total count of books as a single numerical value, without any additional text or explanation. 
+It's important that the output is strictly a number indicating how many books are in the list. 
+If an entry seems incomplete or doesn't clearly start with a book title, count it only if it distinctly appears to be a different book. 
+Please, provide the book count as a numeric value only.
+
+Here is the list: 
