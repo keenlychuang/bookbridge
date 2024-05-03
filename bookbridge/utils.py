@@ -164,21 +164,27 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
     book_name = f'Book Name: {book.title}\n'
     full_prompt = emoji_prompt + book_name + book.blurb
 
-    max_attempts = 2
+    max_attempts = 3
     attempts = 0
+    previous_emoji = None
 
     while attempts < max_attempts:
         try:
             # LLM API call
-            response_text = llm_api_call(full_prompt, openai_api_key)
+            if attempts > 0: 
+                exclude_text = f'Do not use the following emoji:{previous_emoji}\n'
+                response_text = llm_api_call(full_prompt + exclude_text, openai_api_key)
+            else: 
+                response_text = llm_api_call(full_prompt, openai_api_key)
             # Quality check
             if valid_emoji(response_text):
                 return response_text
             else:
                 attempts += 1
-                print(f"Attempt {attempts}: Emoji response did not pass quality check. Retrying...")
+                print(f"Attempt {attempts}: Emoji response did not pass quality check. Emoji: {response_text} Retrying...")
         except Exception as e:
             attempts += 1
+            previous_emoji = response_text
             print(f"Attempt {attempts}: API call failed with error: {e}. Retrying...")
 
     print(response_text)
@@ -380,7 +386,7 @@ def valid_emoji(s: str) -> bool:
     with open('data/valid_emojis_notion.txt', 'r') as file:
         output = file.read()
     notion_emojis = extract_emojis(output)
-    return s in notion_emojis 
+    return s in notion_emojis
 
     emoji_ranges = [
         ('\U0001F600', '\U0001F64F'),  # Emoticons
