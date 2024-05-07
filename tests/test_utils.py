@@ -162,6 +162,15 @@ def test_pdf_to_notion_25():
     print(f"Go Check Out Your New Page: {url}")
 
 
+@pytest.mark.extended 
+def test_pdf_to_notion_40(): 
+    raise NotImplementedError
+
+@pytest.mark.extended 
+def test_pdf_to_notion_59():
+    raise NotImplementedError
+
+
 @pytest.mark.doc
 def test_autofill():
     book = Book("Animal Farm")
