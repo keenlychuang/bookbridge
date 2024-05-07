@@ -184,11 +184,33 @@ def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temper
     string_response = response.choices[0].message.content
     return string_response
 
-def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = FAST_MODEL) -> str:
+def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = SMART_MODEL, max_calls:int = 10) -> str:
     """
     Chained implementation of the llm api call for long outputs. Iteratively feeds output of an llm api call back into the model until the output is complete.  
     """
-    raise NotImplementedError
+    client = OpenAI() 
+    client.api_key = openai_api_key
+    combined_prompt = [{'role':'system', 'content':prompt}]
+    responses, finishes = [],[] 
+    finish = None 
+    num_calls = 0 
+    while finish != 'stop' and num_calls < 10: 
+        num_calls += 1 
+        response = client.chat.completions.create(
+            model=model,
+            messages = combined_prompt,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            frequency_penalty=frequency_penalty)
+        string_response = response.choices[0].message.content
+        responses.append(string_response) 
+        finish = response.choices[0].finish_reason 
+        finishes.append(finish)
+        new_message = {'role': 'assistant', 
+                       'content': string_response}
+        combined_prompt.append(new_message)
+    output = "".join(responses)
+    return output 
 
 def sample_book(openai_api_key:str) -> Book:
     """

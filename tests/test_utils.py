@@ -70,7 +70,12 @@ def test_llm_api_call():
 
 @pytest.mark.extended
 def test_llm_api_call_chained(): 
-    raise NotImplementedError
+    prompt = "Your task is to generate an essay that exceeds 8192 tokens. Just output the essay, it can be about anything you want."
+    openai_key = os.getenv('OPENAI_API_KEY')
+    response = llm_api_call_chained(prompt, openai_key, model=FAST_MODEL)
+    # assume each token on average is about 4 characters 
+    count_tokens = lambda s: len(s)//4 
+    assert count_tokens(response) > 4096 
 
 @pytest.mark.doc
 def test_parse_csv_response():
