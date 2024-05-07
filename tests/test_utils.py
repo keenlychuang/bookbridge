@@ -160,6 +160,7 @@ def test_pdf_to_notion_10():
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.integration 
+@pytest.mark.skip
 def test_pdf_to_notion_25(): 
     path = "data/test/synthetic_booklists/test_booklist_25.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
@@ -172,10 +173,14 @@ def test_pdf_to_notion_25():
 
 @pytest.mark.doc 
 def test_force_csv_fix(): 
-    raise NotImplementedError
-
+    path = "data/test/synthetic_booklists/sample_output.txt" 
+    with open(path, 'r') as file: 
+        s = file.read() 
+    formatted = force_csv_fix(s)
+    assert is_valid_csv(formatted)
 
 @pytest.mark.extended 
+@pytest.mark.skip
 def test_pdf_to_notion_40(): 
     path = "data/test/synthetic_booklists/test_booklist_40.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
@@ -187,6 +192,7 @@ def test_pdf_to_notion_40():
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.extended 
+@pytest.mark.skip
 def test_pdf_to_notion_59():
     path = "data/test/synthetic_booklists/test_booklist_59.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")

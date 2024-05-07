@@ -29,6 +29,7 @@ def bookstring_to_csv(bookstring:str, openai_api_key:str)-> str:
         processing_prompt = file.read() 
     prompt_full = processing_prompt + bookstring
     csv_formatted = llm_api_call_chained(prompt_full, openai_api_key)
+    csv_formatted = force_csv_fix(csv_formatted)
     print("Reformatted booklist...")
     return csv_formatted
 
@@ -61,6 +62,8 @@ def pdf_to_booklist(path:str, openai_api_key:str):
     #string to csv 
     print("Restructuring your booklist...")
     csv = bookstring_to_csv(string, openai_api_key)
+    # try fixing if needed 
+    csv = force_csv_fix(csv)
     try:
         assert is_valid_csv(csv)
     except:
@@ -82,6 +85,8 @@ def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = T
     Raises:
     NotImplementedError: Indicates the function hasn't been implemented yet.
     """
+    force_csv_fix(response_text)
+    print('attempted matching commas')
     reader = csv.reader(response_text.splitlines())  # Split CSV into rows
     books = []
     #skip first row 
@@ -190,11 +195,37 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
     print(response_text)
     raise ValueError("Failed to infer an emoji after maximum attempts.")
 
-def force_csv_fix(s:str):
+def force_csv_fix(input_string:str):
     """ 
-    Attempts to fix the s string into a csv format by counting the appropriate number of commas per line, adding extra to the end of each line where needed. 
+    Attempts to fix the intput string into a csv format by counting the appropriate number of commas per line, adding extra to the end of each line where needed. 
     """ 
-    raise NotImplementedError
+    # Split the input string into lines 
+    lines = input_string.strip().split('\n')
+    
+    # Determine the number of fields from the header
+    num_fields = lines[0].count(',') + 1  # Adding one because the number of fields is one more than the number of commas
+    
+    # Initialize a list to hold corrected lines
+    corrected_lines = []
+    
+    for line in lines:
+        current_num_fields = line.count(',') + 1
+        if current_num_fields > num_fields:
+            # If there are extra commas, split the line, take the first num_fields elements, and join them back
+            line_parts = line.split(',')
+            corrected_line = ','.join(line_parts[:num_fields])
+        elif current_num_fields < num_fields:
+            # If there are missing commas, add them at the end of the line
+            missing_commas = num_fields - current_num_fields
+            corrected_line = line + ',' * missing_commas
+        else:
+            # If the number of fields is correct, no modification is needed
+            corrected_line = line
+        corrected_lines.append(corrected_line)
+    
+    # Join the corrected lines into a single string to be returned
+    corrected_csv = '\n'.join(corrected_lines)
+    return corrected_csv
 
 def create_booklist_database(parent_page: str, notion_key:str) -> str:
     """
