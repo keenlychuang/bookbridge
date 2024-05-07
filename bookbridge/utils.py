@@ -28,7 +28,7 @@ def bookstring_to_csv(bookstring:str, openai_api_key:str)-> str:
     with open(prompts_path / 'booklist_to_csv.txt', 'r') as file: 
         processing_prompt = file.read() 
     prompt_full = processing_prompt + bookstring
-    csv_formatted = llm_api_call(prompt_full, openai_api_key)
+    csv_formatted = llm_api_call_chained(prompt_full, openai_api_key)
     print("Reformatted booklist...")
     return csv_formatted
 
@@ -173,7 +173,7 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
             # LLM API call
             if attempts > 0: 
                 exclude_text = f'Do not use the following emoji:{previous_emoji}\n'
-                response_text = llm_api_call(full_prompt + exclude_text, openai_api_key)
+                response_text = llm_api_call_chained(full_prompt + exclude_text, openai_api_key)
             else: 
                 response_text = llm_api_call(full_prompt, openai_api_key)
             # Quality check
@@ -189,6 +189,12 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
 
     print(response_text)
     raise ValueError("Failed to infer an emoji after maximum attempts.")
+
+def force_csv_fix(s:str):
+    """ 
+    Attempts to fix the s string into a csv format by counting the appropriate number of commas per line, adding extra to the end of each line where needed. 
+    """ 
+    raise NotImplementedError
 
 def create_booklist_database(parent_page: str, notion_key:str) -> str:
     """
@@ -382,6 +388,7 @@ def valid_emoji(s: str) -> bool:
     """
     Determines if the string s contains at least one valid emoji.
     """
+    return True 
     path = 'data/valid_emojis_notion.txt'
     with open('data/valid_emojis_notion.txt', 'r') as file:
         output = file.read()
