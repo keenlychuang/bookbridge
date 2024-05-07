@@ -70,14 +70,14 @@ def test_llm_api_call():
 
 @pytest.mark.extended
 def test_llm_api_call_chained(): 
-    prompt = "Your task is to generate an essay that exceeds 8192 tokens. Just output the essay, it can be about anything you want."
+    prompt = "Your task is to generate a booklist of 50 books, each with an author and short description."
     openai_key = os.getenv('OPENAI_API_KEY')
-    response = llm_api_call_chained(prompt, openai_key, model=FAST_MODEL)
+    response = llm_api_call_chained(prompt, openai_key, max_tokens=512, model=FAST_MODEL)
     # assume each token on average is about 4 characters 
     count_tokens = lambda s: len(s)//4 
-    assert count_tokens(response) > 4096 
+    assert count_tokens(response) > 512
 
-@pytest.mark.doc
+@pytest.mark.doc    
 def test_parse_csv_response():
     with open('data/test/synthetic_booklists/sample.csv', 'r') as file:
         output = file.read()

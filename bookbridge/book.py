@@ -194,7 +194,7 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 4096
     responses, finishes = [],[] 
     finish = None 
     num_calls = 0 
-    while finish != 'stop' and num_calls < 10: 
+    while finish != 'stop' and num_calls < max_calls: 
         num_calls += 1 
         response = client.chat.completions.create(
             model=model,
@@ -210,6 +210,10 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 4096
                        'content': string_response}
         combined_prompt.append(new_message)
     output = "".join(responses)
+    print("len of responses:\n", [len(response) for response in responses])
+    print("len of output:\n", len(output))
+    print("finishes:\n", finishes)
+    print(output)
     return output 
 
 def sample_book(openai_api_key:str) -> Book:
