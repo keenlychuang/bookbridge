@@ -8,6 +8,7 @@ from enum import Enum
 # Assuming this script is in the package root (next to prompts/)
 current_file_path = Path(__file__).resolve()
 package_root = current_file_path.parent  # This is the 'bookbridge/bookbridge/' directory
+repo_root = package_root.parent # where everything else is located 
 prompts_path = package_root / "prompts"
 
 valid_genres = [
@@ -70,7 +71,6 @@ class Book:
         self.author = author
         self.genre = genre
         self.blurb = blurb
-        #TODO: Including "inprogress" for status 
         self.status = status
         self.rating = round(rating) if rating is not None else None 
         self.rating_selection = "Not Rated"
@@ -104,8 +104,6 @@ class Book:
                 genre_prompt = file.read() 
             prompt = genre_prompt + f"\n{valid_genres_string}\n\n{self.title}"
             genre_string = llm_api_call(prompt=prompt, openai_api_key= openai_api_key)
-            #TODO: Enforce Genres 
-            # assert genre_string in valid_genres, f'{genre_string} not valid'
             self.genre = genre_string
         #fill blurb 
         if self.blurb is None: 
@@ -183,7 +181,7 @@ def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temper
     string_response = response.choices[0].message.content
     return string_response
 
-def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = SMART_MODEL, max_calls:int = 10) -> str:
+def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 1024, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = SMART_MODEL, max_calls:int = 16) -> str:
     """
     Chained implementation of the llm api call for long outputs. Iteratively feeds output of an llm api call back into the model until the output is complete.  
     """
@@ -208,11 +206,9 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 4096
         new_message = {'role': 'assistant', 
                        'content': string_response}
         combined_prompt.append(new_message)
+    print([len(response) for response in responses])
+    print(finishes)
     output = "".join(responses)
-    # print("len of responses:\n", [len(response) for response in responses])
-    # print("len of output:\n", len(output))
-    # print("finishes:\n", finishes)
-    # print(output)
     return output 
 
 def sample_book(openai_api_key:str) -> Book:
@@ -237,3 +233,25 @@ def sample_booklist(openai_api_key:str) -> List:
     for book in booklist:
         book.llm_autofill(openai_api_key)
     return booklist 
+
+def _extract_titles(path_to_folder: str) -> List[str]:
+    """
+    Extract book titles from txt files in a folder. Assumes each txt file contains EXACTLY
+    only book titles separated by new lines.
+    """
+    titles = []
+    # Iterate through each file in the specified folder
+    for filename in os.listdir(path_to_folder):
+        # Check if the file is a .txt file
+        if filename.endswith(".txt"):
+            # Construct the full path to the file
+            file_path = os.path.join(path_to_folder, filename)
+            # Open and read the file
+            with open(file_path, 'r', encoding='utf-8') as file:
+                # Read the file's content, strip extra whitespace, and split by new lines
+                file_contents = file.read().strip()
+                titles_in_file = file_contents.split('\n')
+                # Extend the main titles list with the titles from this file
+                titles.extend(titles_in_file)
+    # Return the list of titles
+    return titles

@@ -68,7 +68,7 @@ def pdf_to_booklist(path:str, openai_api_key:str):
 
     # try fixing if needed 
     csv = force_csv_fix(csv)
-    print("PDF TO BOOKLIST OUTPUT:\n", csv)
+    # print("PDF TO BOOKLIST OUTPUT:\n", csv)
     try:
         assert is_valid_csv(csv)
     except:
@@ -90,8 +90,8 @@ def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = T
     Raises:
     NotImplementedError: Indicates the function hasn't been implemented yet.
     """
-    print("RESPONSE TEXT\n", response_text)
-    print("SPLIT\n", response_text.splitlines())
+    # print("RESPONSE TEXT\n", response_text)
+    # print("SPLIT\n", response_text.splitlines())
 
     reader = csv.reader(response_text.splitlines())  # Split CSV into rows
     books = []
@@ -173,29 +173,36 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
 
     max_attempts = 3
     attempts = 0
-    previous_emoji = None
+    previous_emojis = [] 
 
     while attempts < max_attempts:
         try:
             # LLM API call
             if attempts > 0: 
-                exclude_text = f'Do not use the following emoji:{previous_emoji}\n'
-                response_text = llm_api_call_chained(full_prompt + exclude_text, openai_api_key)
+                exclude_text = f'Do not use the following emojis:{previous_emojis}\n'
+                new_prompt = full_prompt + exclude_text
+                print(new_prompt)
+                response_text = clean_up_emoji(llm_api_call_chained(new_prompt, openai_api_key))
             else: 
-                response_text = llm_api_call(full_prompt, openai_api_key)
+                response_text = clean_up_emoji(llm_api_call(full_prompt, openai_api_key))
             # Quality check
             if valid_emoji(response_text):
                 return response_text
             else:
                 attempts += 1
+                previous_emojis.append(response_text)
                 print(f"Attempt {attempts}: Emoji response did not pass quality check. Emoji: {response_text} Retrying...")
         except Exception as e:
             attempts += 1
-            previous_emoji = response_text
             print(f"Attempt {attempts}: API call failed with error: {e}. Retrying...")
 
     print(response_text)
     raise ValueError("Failed to infer an emoji after maximum attempts.")
+
+# reduce emoji to base, avoiding modifiers 
+def clean_up_emoji(emoji_string:str):
+    modifier_pattern = re.compile('[\U0001F3FB-\U0001F3FF]')
+    return modifier_pattern.sub('', emoji_string)   
 
 def force_csv_fix(input_string: str):
     """
@@ -228,9 +235,12 @@ def force_csv_fix(input_string: str):
                 field += char
         corrected_line += field  # Add the last field
 
-        # Add missing commas if necessary
+        # Add missing commas if necessary, remove if necessary
         missing_commas = (num_fields - 1) - num_commas
-        corrected_line += ',' * missing_commas
+        if missing_commas > 0: 
+            corrected_line += ',' * missing_commas
+        elif missing_commas <0: 
+            corrected_line = corrected_line[:missing_commas]
 
         corrected_lines.append(corrected_line)
 
@@ -384,12 +394,10 @@ def add_booklist_page(book: Book, database_id: str, notion_key: str, openai_api_
         },
     }
 
-    print(book.recs)
     if book.recs:
         properties['Recommended By'] = {
             "multi_select": [{"name": recommender} for recommender in book.recs]
         }
-    print(properties)
 
     children = [
         {
@@ -430,7 +438,6 @@ def valid_emoji(s: str) -> bool:
     """
     Determines if the string s contains at least one valid emoji.
     """
-    return True 
     path = 'data/valid_emojis_notion.txt'
     with open('data/valid_emojis_notion.txt', 'r') as file:
         output = file.read()

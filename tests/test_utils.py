@@ -160,7 +160,6 @@ def test_pdf_to_notion_10():
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.integration 
-@pytest.mark.skip
 def test_pdf_to_notion_25(): 
     path = "data/test/synthetic_booklists/test_booklist_25.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
@@ -177,10 +176,10 @@ def test_force_csv_fix():
     with open(path, 'r') as file: 
         s = file.read() 
     formatted = force_csv_fix(s)
+    print(formatted)
     assert is_valid_csv(formatted)
 
 @pytest.mark.extended 
-@pytest.mark.skip
 def test_pdf_to_notion_40(): 
     path = "data/test/synthetic_booklists/test_booklist_40.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
@@ -192,9 +191,18 @@ def test_pdf_to_notion_40():
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.extended 
-@pytest.mark.skip
 def test_pdf_to_notion_59():
     path = "data/test/synthetic_booklists/test_booklist_59.pdf"
+    notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
+    test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
+    # function call 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, openai_key)
+    # go check that the page actually contains a good booklist 
+    print(f"Go Check Out Your New Page: {url}")
+
+def test_pdf_to_notion_72d():
+    path = "data/test/synthetic_booklists/test_booklist_72d.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
@@ -212,8 +220,6 @@ def test_autofill():
     # assert proper formatting on first three fields 
     assert book.title == "Animal Farm"
     assert book.author == "George Orwell"
-    #TODO either enforce or disregard valid_genres
-    # assert book.genre in valid_genres
     assert book.status is not None
 
     # doesn't matter which blurb, should not complete other fields
@@ -223,7 +229,7 @@ def test_autofill():
 
 @pytest.mark.doc
 def test_pretty_print():
-    book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5, ['Joey', 'Tristan', 'Yugi', 'Kuriboh'])
+    book = Book("Sample Title", "Author Name", "fiction", True, "Sample blurb", 4.5, ['Joey', 'Tristan', 'Yugi', 'Tea'])
     print(book)
 
 @pytest.mark.notion 
@@ -339,6 +345,12 @@ def test_valid_emoji():
     assert results == [True, True, False, False, False]
 
 @pytest.mark.doc 
+def test_clean_up_emoji():
+    input_emoji = '👍🏽'
+    base_emoji = clean_up_emoji(input_emoji)
+    print(base_emoji)
+
+@pytest.mark.doc 
 def test_extract_emojis():
     with open('data/valid_emojis_notion.txt', 'r') as file:
         output = file.read()
@@ -366,5 +378,7 @@ def test_search_notion_id_with_incomplete_url():
     actual_id = search_notion_id("https://www.notion.so")
     assert actual_id is None, "Expected to get None for an incomplete URL."
     
+
+
 if __name__ == "__main__":
     pytest.main()

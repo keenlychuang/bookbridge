@@ -13,6 +13,7 @@ configobj==5.0.8
 configparser==7.0.0
 dictdiffer==0.9.0
 distro==1.9.0
+emoji==2.11.1
 etelemetry==0.3.1
 exceptiongroup==1.2.1
 filelock==3.14.0
