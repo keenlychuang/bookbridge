@@ -33,28 +33,31 @@ def bookstring_to_csv(bookstring:str, openai_api_key:str)-> str:
     print("Reformatted booklist...")
     return csv_formatted
 
-def is_valid_csv(csv_string:str):
-    """
-    Determines if the csv_string is in a valid csv format that could be processed by the csv package 
-    """
-    # Use StringIO to convert the string into a file-like object for the CSV reader
-    csv_file_like_object = io.StringIO(csv_string)
+def is_valid_csv(csv_string):
+    rows = csv_string.strip().split('\n')
     
-    reader = csv.reader(csv_file_like_object)
-    rows = list(reader)
+    # Assuming the first row is the header
+    num_columns = count_columns(rows[0])
     
-    if not rows:
-        return False  # Returns False for empty CSV strings
-    
-    # Determine the number of columns from the header row
-    num_columns = len(rows[0])
-    
+    # Check each row for the correct number of columns
     for row in rows:
-        # Now fields are correctly parsed by the csv.reader
-        if len(row) != num_columns:
+        if count_columns(row) != num_columns:
             return False
     
     return True
+
+def count_columns(row):
+    """
+    Counts the number of columns in a row, ignoring commas within quotes.
+    """
+    in_quotes = False
+    column_count = 0
+    for i, char in enumerate(row):
+        if char == '"' and (i == 0 or row[i-1] != '\\'):  # Check for non-escaped quote
+            in_quotes = not in_quotes
+        if char == ',' and not in_quotes:
+            column_count += 1
+    return column_count + 1  # Add one because column count is one more than comma count
 
 def pdf_to_booklist(path:str, openai_api_key:str): 
     #pdf to string
@@ -62,8 +65,10 @@ def pdf_to_booklist(path:str, openai_api_key:str):
     #string to csv 
     print("Restructuring your booklist...")
     csv = bookstring_to_csv(string, openai_api_key)
+
     # try fixing if needed 
     csv = force_csv_fix(csv)
+    print("PDF TO BOOKLIST OUTPUT:\n", csv)
     try:
         assert is_valid_csv(csv)
     except:
@@ -85,27 +90,24 @@ def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = T
     Raises:
     NotImplementedError: Indicates the function hasn't been implemented yet.
     """
-    force_csv_fix(response_text)
-    print('attempted matching commas')
+    print("RESPONSE TEXT\n", response_text)
+    print("SPLIT\n", response_text.splitlines())
+
     reader = csv.reader(response_text.splitlines())  # Split CSV into rows
     books = []
     #skip first row 
     next(reader,None)
     for row in tqdm(reader, "Processing Rows"):
-        try: 
-            title, author, status, rating, blurb,recs = row  # Unpacking row values
-            # chagne from status string. Expecting status as 0,1,2
-            status = BookStatus.from_int(int(status))
-            rating = float(rating) if rating else None  
-            genre = None 
-            # unpacking recs 
-            recs = recs.split("/")
-            recs = list(filter(lambda recommendation: True if recommendation != '' else False, recs))
-            book = Book(title, author, genre, status, blurb, rating, recs) 
-            books.append(book)
-        except: 
-            print(row)
-            raise ValueError("Error in parsing CSV formatted str")
+        title, author, status, rating, blurb,recs = row  # Unpacking row values
+        # chagne from status string. Expecting status as 0,1,2
+        status = BookStatus.from_int(int(status))
+        rating = float(rating) if rating else None  
+        genre = None 
+        # unpacking recs 
+        recs = recs.split("/")
+        recs = list(filter(lambda recommendation: True if recommendation != '' else False, recs))
+        book = Book(title, author, genre, status, blurb, rating, recs) 
+        books.append(book)
     if autofill:
         for book in tqdm(books, "autofilling fields"):
             book.llm_autofill(openai_api_key)
@@ -195,34 +197,43 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
     print(response_text)
     raise ValueError("Failed to infer an emoji after maximum attempts.")
 
-def force_csv_fix(input_string:str):
-    """ 
-    Attempts to fix the intput string into a csv format by counting the appropriate number of commas per line, adding extra to the end of each line where needed. 
-    """ 
-    # Split the input string into lines 
+def force_csv_fix(input_string: str):
+    """
+    Attempts to fix the input string into a csv format by ensuring the correct number of fields per line,
+    ignoring commas within quoted strings.
+    """
     lines = input_string.strip().split('\n')
-    
-    # Determine the number of fields from the header
-    num_fields = lines[0].count(',') + 1  # Adding one because the number of fields is one more than the number of commas
-    
-    # Initialize a list to hold corrected lines
+    num_fields = lines[0].count(',') + 1  # Assumes the header has the correct number of fields
+
     corrected_lines = []
-    
+
     for line in lines:
-        current_num_fields = line.count(',') + 1
-        if current_num_fields > num_fields:
-            # If there are extra commas, split the line, take the first num_fields elements, and join them back
-            line_parts = line.split(',')
-            corrected_line = ','.join(line_parts[:num_fields])
-        elif current_num_fields < num_fields:
-            # If there are missing commas, add them at the end of the line
-            missing_commas = num_fields - current_num_fields
-            corrected_line = line + ',' * missing_commas
-        else:
-            # If the number of fields is correct, no modification is needed
-            corrected_line = line
+        corrected_line = ''
+        field = ''
+        num_commas = 0
+        in_quotes = False
+        for char in line:
+            if char == '"' and not in_quotes:
+                # Entering a quoted string
+                in_quotes = True
+            elif char == '"' and in_quotes:
+                # Exiting a quoted string
+                in_quotes = False
+            if char == ',' and not in_quotes:
+                # Count commas only when not in quotes
+                num_commas += 1
+                corrected_line += field + char
+                field = ''
+            else:
+                field += char
+        corrected_line += field  # Add the last field
+
+        # Add missing commas if necessary
+        missing_commas = (num_fields - 1) - num_commas
+        corrected_line += ',' * missing_commas
+
         corrected_lines.append(corrected_line)
-    
+
     # Join the corrected lines into a single string to be returned
     corrected_csv = '\n'.join(corrected_lines)
     return corrected_csv

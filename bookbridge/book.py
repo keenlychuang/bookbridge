@@ -90,14 +90,13 @@ class Book:
         Raises:
         NotImplementedError: Indicates the method hasn't been implemented yet.
         """
-        light_model = "gpt-3.5-turbo"
         authored, genred, blurbed = False, False, False
         #fill author 
         if self.author is None: 
             with open(prompts_path/'infer_author.txt', 'r') as file:
                 author_prompt = file.read() 
             prompt = author_prompt + f"\n\n{self.title}"
-            author_string = llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=light_model)
+            author_string = llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=FAST_MODEL)
             self.author = author_string 
         #fill genre 
         if self.genre is None: 
@@ -113,7 +112,7 @@ class Book:
             with open(prompts_path/'infer_blurb.txt', 'r') as file:
                 blurb_prompt = file.read() 
             prompt = blurb_prompt + f"\n\n{self.title}"
-            blurb_string =llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=light_model)
+            blurb_string =llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=FAST_MODEL)
             self.blurb = blurb_string
     
     def update_rating_selection(self) -> None: 
@@ -210,10 +209,10 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 4096
                        'content': string_response}
         combined_prompt.append(new_message)
     output = "".join(responses)
-    print("len of responses:\n", [len(response) for response in responses])
-    print("len of output:\n", len(output))
-    print("finishes:\n", finishes)
-    print(output)
+    # print("len of responses:\n", [len(response) for response in responses])
+    # print("len of output:\n", len(output))
+    # print("finishes:\n", finishes)
+    # print(output)
     return output 
 
 def sample_book(openai_api_key:str) -> Book:
