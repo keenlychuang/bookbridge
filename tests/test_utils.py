@@ -68,6 +68,10 @@ def test_llm_api_call():
     print(f"llm api call produced the following test response:\n{response}")
     assert isinstance(response, str)
 
+@pytest.mark.extended
+def test_llm_api_call_chained(): 
+    raise NotImplementedError
+
 @pytest.mark.doc
 def test_parse_csv_response():
     with open('data/test/synthetic_booklists/sample.csv', 'r') as file:
@@ -169,7 +173,6 @@ def test_pdf_to_notion_40():
 @pytest.mark.extended 
 def test_pdf_to_notion_59():
     raise NotImplementedError
-
 
 @pytest.mark.doc
 def test_autofill():
