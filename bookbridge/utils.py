@@ -29,7 +29,6 @@ def bookstring_to_csv(bookstring:str, openai_api_key:str)-> str:
         processing_prompt = file.read() 
     prompt_full = processing_prompt + bookstring
     csv_formatted = llm_api_call_chained(prompt_full, openai_api_key)
-    csv_formatted = force_csv_fix(csv_formatted)
     print("Reformatted booklist...")
     return csv_formatted
 
@@ -68,7 +67,6 @@ def pdf_to_booklist(path:str, openai_api_key:str):
 
     # try fixing if needed 
     csv = force_csv_fix(csv)
-    # print("PDF TO BOOKLIST OUTPUT:\n", csv)
     try:
         assert is_valid_csv(csv)
     except:
@@ -129,7 +127,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
             text += page.get_text()
     return text
 
-def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page: str, openai_api_key:str): 
+def python_to_notion_database(notion_key: str, booklifst: List[Book], parent_page: str, openai_api_key:str): 
     """ 
     Given a list of Books, creates a Notion Database with entries corresponding to each book.
 
@@ -209,6 +207,11 @@ def force_csv_fix(input_string: str):
     Attempts to fix the input string into a csv format by ensuring the correct number of fields per line,
     ignoring commas within quoted strings.
     """
+
+    #TODO: debugging write to file 
+    with open("before_procoessing.csv", "w")as file: 
+        file.write(input_string)
+
     lines = input_string.strip().split('\n')
     num_fields = lines[0].count(',') + 1  # Assumes the header has the correct number of fields
 
@@ -246,6 +249,11 @@ def force_csv_fix(input_string: str):
 
     # Join the corrected lines into a single string to be returned
     corrected_csv = '\n'.join(corrected_lines)
+
+    #TODO debugging: writing output 
+    with open("after_processing.csv", "w") as processed: 
+        processed.write(corrected_csv)
+
     return corrected_csv
 
 def create_booklist_database(parent_page: str, notion_key:str) -> str:
@@ -432,8 +440,6 @@ def add_booklist_page(book: Book, database_id: str, notion_key: str, openai_api_
     response = notion.pages.create(**args)
     return response["id"]
 
-
-#TODO: only single emoji, check from api generated txt 
 def valid_emoji(s: str) -> bool:
     """
     Determines if the string s contains at least one valid emoji.

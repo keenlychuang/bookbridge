@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="./assets/icon_color.png" alt="Icon Alt Text" title="Icon Title" width="256"/>
+    <img src="./assets/banner.png" alt="Icon Alt Text" title="Icon Title" style="width: 70%; height: auto;"/>
 </div>
 
 # BookBridge - Booklist Import Tool
