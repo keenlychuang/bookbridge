@@ -107,7 +107,23 @@ def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = T
     if autofill:
         for book in tqdm(books, "autofilling fields"):
             book.llm_autofill(openai_api_key)
+    
+    # remove duplicates 
+    books = remove_duplicate_books(books)
     return books
+
+def remove_duplicate_books(booklist: List[Book]) -> List[Book]:
+    """
+    Given a list of book instances, removes duplicate books by Book.title, which is a string.
+    """
+    seen_titles = set()
+    unique_books = []
+    for book in booklist:
+        if book.title not in seen_titles:
+            seen_titles.add(book.title)
+            unique_books.append(book)
+    
+    return unique_books
 
 def extract_text_from_pdf(pdf_path: str) -> str:
     """
@@ -273,6 +289,9 @@ def force_csv_fix(input_string: str):
     Attempts to fix the input string into a CSV format by ensuring the correct number of fields per line,
     ignoring commas within quoted strings, and ensuring the summary field is enclosed in quotes.
     """
+    #TODO DEBUGGING write to file 
+    with open("before_procoessing.csv", "w")as file: 
+        file.write(input_string)
 
     lines = input_string.strip().split('\n')
     num_fields = lines[0].count(',') + 1  # Assumes the header has the correct number of fields
@@ -317,6 +336,10 @@ def force_csv_fix(input_string: str):
 
     # Join the corrected lines into a single string to be returned
     corrected_csv = '\n'.join(corrected_lines)
+
+    #TODO DEBUGGING write to file 
+    with open("after_processing.csv", "w") as processed: 
+        processed.write(corrected_csv)
 
     return corrected_csv
 

@@ -23,6 +23,7 @@ Follow these guidelines:
 
 Example entries: 
 "The Fountainhead",Ayn Rand,0,,Bob/Joe,"A novel about an individualistic young architect's struggle against traditional standards and his pursuit of creative freedom"
+"Stolen Focus",Johann Hari,0,,,
 "1984",George Orwell,0,5,Chirs/Tammy,"A dystopian novel that explores the dangers of totalitarianism."
 "The Shadow of the Wind",Carlos Ruiz Zafón,0,,Ted,"A captivating tale set in post-war Barcelona, blending mystery, romance, and history as a young boy discovers a hidden library of forgotten books."
 

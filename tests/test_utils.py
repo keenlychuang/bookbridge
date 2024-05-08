@@ -201,6 +201,18 @@ def test_pdf_to_notion_59():
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
+@pytest.mark.extended
+def test_pdf_to_notion_30d(): 
+    path = "data/test/synthetic_booklists/test_booklist_30d.pdf"
+    notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
+    test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
+    # function call 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, openai_key)
+    # go check that the page actually contains a good booklist 
+    print(f"Go Check Out Your New Page: {url}")
+
+@pytest.mark.extended
 def test_pdf_to_notion_72d():
     path = "data/test/synthetic_booklists/test_booklist_72d.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
