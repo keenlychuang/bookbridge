@@ -181,7 +181,7 @@ def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temper
     string_response = response.choices[0].message.content
     return string_response
 
-def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = FAST_MODEL, max_calls:int = 8) -> str:
+def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = SMART_MODEL, max_calls:int = 8) -> str:
     """
     Chained implementation of the llm api call for long outputs. Iteratively feeds output of an llm api call back into the model until the output is complete.  
     """

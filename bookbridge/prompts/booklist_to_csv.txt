@@ -1,8 +1,8 @@
 You will be tasked with converting a provided booklist into CSV format. 
-The CSV should include columns for the title, author, completion status (not started, in progress, or completed), rating (if available), a brief summary or blurb of the book, and people who would recommend the book. 
+The CSV should include columns for the title, author, completion status (not started, in progress, or completed), rating (if available), people who would recommend the book. and a brief summary or blurb of the book. 
 Follow these guidelines:
 
-1. Begin your CSV with a header row as follows: title,author,completed,rating,summary,recs
+1. Begin your CSV with a header row as follows: title,author,completed,rating,recs,summary
    - Ensure each line in the csv has the proper amount of commas seperating each value. 
 
 2. For each book:
@@ -22,9 +22,9 @@ Follow these guidelines:
 6. Each entry in the CSV should represent one book, with fields separated by commas and each book on a new line.
 
 Example entries: 
-"The Fountainhead",Ayn Rand,0,,"A novel about an individualistic young architect's struggle against traditional standards and his pursuit of creative freedom",Bob/Joe
-"1984",George Orwell,0,5,"A dystopian novel that explores the dangers of totalitarianism.",Chris/Tammy
-"The Shadow of the Wind",Carlos Ruiz Zafón,0,,"A captivating tale set in post-war Barcelona, blending mystery, romance, and history as a young boy discovers a hidden library of forgotten books.",Ted
+"The Fountainhead",Ayn Rand,0,,Bob/Joe,"A novel about an individualistic young architect's struggle against traditional standards and his pursuit of creative freedom"
+"1984",George Orwell,0,5,Chirs/Tammy,"A dystopian novel that explores the dangers of totalitarianism."
+"The Shadow of the Wind",Carlos Ruiz Zafón,0,,Ted,"A captivating tale set in post-war Barcelona, blending mystery, romance, and history as a young boy discovers a hidden library of forgotten books."
 
 Your output should be the text of the CSV file, starting with the header and ending with the last row of book data.
 Make sure not to include the opening or closing ``` characters
