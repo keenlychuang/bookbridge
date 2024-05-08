@@ -181,7 +181,7 @@ def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temper
     string_response = response.choices[0].message.content
     return string_response
 
-def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 1024, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = SMART_MODEL, max_calls:int = 16) -> str:
+def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = FAST_MODEL, max_calls:int = 8) -> str:
     """
     Chained implementation of the llm api call for long outputs. Iteratively feeds output of an llm api call back into the model until the output is complete.  
     """
@@ -199,15 +199,17 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 1024
             temperature=temperature,
             max_tokens=max_tokens,
             frequency_penalty=frequency_penalty)
+        print(f"Got resopnse! Call #:{num_calls}")
         string_response = response.choices[0].message.content
+        print(f"Last Line:{string_response.splitlines()[-1]}")
+        print(f"Response Length: {len(string_response)}")
         responses.append(string_response) 
         finish = response.choices[0].finish_reason 
         finishes.append(finish)
+        print(f"End reason: {finish}")
         new_message = {'role': 'assistant', 
                        'content': string_response}
         combined_prompt.append(new_message)
-    print([len(response) for response in responses])
-    print(finishes)
     output = "".join(responses)
     return output 
 

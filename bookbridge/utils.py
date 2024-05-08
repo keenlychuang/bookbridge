@@ -60,10 +60,10 @@ def count_columns(row):
 
 def pdf_to_booklist(path:str, openai_api_key:str): 
     #pdf to string
-    string = extract_text_from_pdf(path)
+    bookstring = extract_text_from_pdf(path)
     #string to csv 
     print("Restructuring your booklist...")
-    csv = bookstring_to_csv(string, openai_api_key)
+    csv = bookstring_to_csv(bookstring, openai_api_key)
 
     # try fixing if needed 
     csv = force_csv_fix(csv)
@@ -88,9 +88,7 @@ def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = T
     Raises:
     NotImplementedError: Indicates the function hasn't been implemented yet.
     """
-    # print("RESPONSE TEXT\n", response_text)
-    # print("SPLIT\n", response_text.splitlines())
-
+    #remove empty rows 
     reader = csv.reader(response_text.splitlines())  # Split CSV into rows
     books = []
     #skip first row 
@@ -127,7 +125,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
             text += page.get_text()
     return text
 
-def python_to_notion_database(notion_key: str, booklifst: List[Book], parent_page: str, openai_api_key:str): 
+def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page: str, openai_api_key:str): 
     """ 
     Given a list of Books, creates a Notion Database with entries corresponding to each book.
 
@@ -179,7 +177,6 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
             if attempts > 0: 
                 exclude_text = f'Do not use the following emojis:{previous_emojis}\n'
                 new_prompt = full_prompt + exclude_text
-                print(new_prompt)
                 response_text = clean_up_emoji(llm_api_call_chained(new_prompt, openai_api_key))
             else: 
                 response_text = clean_up_emoji(llm_api_call(full_prompt, openai_api_key))
@@ -198,9 +195,24 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
     raise ValueError("Failed to infer an emoji after maximum attempts.")
 
 # reduce emoji to base, avoiding modifiers 
-def clean_up_emoji(emoji_string:str):
+# def clean_up_emoji(emoji_string:str):
+#     modifier_pattern = re.compile('[\U0001F3FB-\U0001F3FF]')
+#     return modifier_pattern.sub('', emoji_string)
+
+def clean_up_emoji(emoji_string: str):
+    # Pattern to match common emojis, including those with skin tone modifiers
+    emoji_pattern = re.compile('(?:[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F700-\U0001F77F\U0001F780-\U0001F7FF\U0001F800-\U0001F8FF\U0001F900-\U0001F9FF\U0001FA00-\U0001FA6F\U0001FA70-\U0001FAFF\U00002702-\U000027B0\U0001F1E0-\U0001F1FF\U00002500-\U00002BEF\U00002B00-\U00002BFF\U00002300-\U000023FF\U00002100-\U0000214F\U00002600-\U000026FF])')
     modifier_pattern = re.compile('[\U0001F3FB-\U0001F3FF]')
-    return modifier_pattern.sub('', emoji_string)   
+    
+    # Find all emojis in the string
+    emojis = emoji_pattern.findall(emoji_string)
+    
+    # Take the first emoji found, if any, and remove skin tone modifiers
+    if emojis:
+        first_emoji = emojis[0]
+        return modifier_pattern.sub('', first_emoji)
+    else:
+        return ''  # Return an empty string if no emoji is found
 
 def force_csv_fix(input_string: str):
     """

@@ -13,19 +13,18 @@ Follow these guidelines:
        - For each book, if it was recommended by someone, include the name in the field. You can include multiple names, but seperate them with a '/' character. 
        - If there was no recommendation, simply leave the field blank. 
 
-3. If a field contains commas, newline characters, or double quotes, enclose the entire field in double quotes. If a field contains double quotes, escape these by doubling them (e.g., a quote `"` becomes two quotes `""`).
+3. For the title and summary fields, which sometimes contain commas, enclose the entire field in double quotes. If a field contains double quotes, escape these by doubling them (e.g., a quote `"` becomes two quotes `""`).
 
-4. Ensure all rows, including the header, have the same number of fields, using commas to delimit fields. If a field is empty, include the comma but leave the space between commas empty (e.g., `,,` for two consecutive empty fields).
+4. Try to ensure all rows, including the header, have the same number of fields, using commas to delimit fields. If a field is empty, include the comma but leave the space between commas empty (e.g., `,,` for two consecutive empty fields).
 
 5. Do not infer or add any information not explicitly provided in the booklist. This includes not attempting to fill in missing ratings or summaries.
 
 6. Each entry in the CSV should represent one book, with fields separated by commas and each book on a new line.
 
-Example entry:
-The Fountainhead,Ayn Rand,0,,"A novel about an individualistic young architect's struggle against traditional standards and his pursuit of creative freedom",
-
-Another example:
-1984,George Orwell,0,5,"A dystopian novel that explores the dangers of totalitarianism.",
+Example entries: 
+"The Fountainhead",Ayn Rand,0,,"A novel about an individualistic young architect's struggle against traditional standards and his pursuit of creative freedom",Bob/Joe
+"1984",George Orwell,0,5,"A dystopian novel that explores the dangers of totalitarianism.",Chris/Tammy
+"The Shadow of the Wind",Carlos Ruiz Zafón,0,,"A captivating tale set in post-war Barcelona, blending mystery, romance, and history as a young boy discovers a hidden library of forgotten books.",Ted
 
 Your output should be the text of the CSV file, starting with the header and ending with the last row of book data.
 Make sure not to include the opening or closing ``` characters
