@@ -191,8 +191,17 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048
     responses, finishes = [],[] 
     finish = None 
     num_calls = 0 
+    
+    # #use smart model if we exceed a certain context length. Assume 4 chars is about 1 token. 
+    # current_context_chars = len(prompt)
+    # max_fast_model_context = 4 * 10000
+
     while finish != 'stop' and num_calls < max_calls: 
         num_calls += 1 
+        # if current_context_chars > max_fast_model_context:
+        #     model = SMART_MODEL
+        #     print("Swapped to larger model for increased context")
+        print("Calling Model...")
         response = client.chat.completions.create(
             model=model,
             messages = combined_prompt,
@@ -203,6 +212,7 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048
         string_response = response.choices[0].message.content
         print(f"Last Line:{string_response.splitlines()[-1]}")
         print(f"Response Length: {len(string_response)} chars")
+        # current_context_chars += len(string_response)
         responses.append(string_response) 
         finish = response.choices[0].finish_reason 
         finishes.append(finish)
