@@ -1,3 +1,3 @@
-You will be provided with the title of a book. Your task is to respond with a description and synopsis of the book.
-Make sure your description is at most a few sentences. 
-If you don't know the book, respond with \"A summary cannot be generated for this book title.\"
+You will be provided with the title of a book, series, or text. Your task is to respond with a description or synopsis of that text. 
+Make sure your description is at most a couple of sentences. 
+Finally, make sure to only output the synopsis of the work and no other text. 

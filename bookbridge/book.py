@@ -322,15 +322,15 @@ def synthetic_booklist(num_books:int, openai_key:str, status:bool = False, recs:
     
     for book in tqdm(booklist, "constructing lines"): 
         # randomly pick a status if specified
-        status_string = '' if not status else random.sample({"Complete", "In Progress", "Not Started"},1)
+        status_string = '' if not status else (random.sample({"Complete", "In Progress", "Not Started"},1)[0] + ', ')
         # randomly add a recommender if specified 
-        recs_string = '' if not recs else random.sample({'', pick_random_name_and_capitalize(names_list)},1)
-        s = f"{book.title}:{book.blurb}\n"+f"{recs_string}, {status_string}\n"
-        booklist_string += s
+        recs_string = '' if not recs else random.sample({'', pick_random_name_and_capitalize(names_list)},1)[0]
+        complete_string = f"{book.title}:{book.blurb}\n" + f"{status_string}" + f"{recs_string}\n"
+        booklist_string += complete_string
 
     # check if writing and output 
     if write: 
-        synthetic_title = f"synthetic_booklsit_{num_books}{'r' if recs else ''}{'s' if status else ''}"
+        synthetic_title = f"synthetic_booklist_{num_books}{'r' if recs else ''}{'s' if status else ''}.txt"
         with open(synthetic_title, "w") as file:
             file.write(booklist_string)
 
