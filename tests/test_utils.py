@@ -389,7 +389,6 @@ def test_search_notion_id_with_incomplete_url():
     """Test searching a Notion ID from an incomplete URL."""
     actual_id = search_notion_id("https://www.notion.so")
     assert actual_id is None, "Expected to get None for an incomplete URL."
-    
 
 
 if __name__ == "__main__":

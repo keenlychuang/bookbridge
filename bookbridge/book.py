@@ -1,3 +1,6 @@
+import random
+import os
+from tqdm import tqdm 
 from typing import Literal, Optional, List
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -24,6 +27,19 @@ Genre = Literal[
                 'philosophy', 'anthology', 'memoir', 'short-story', 'historical-fiction', 'magical-realism'
                 ]
 valid_genres_string = str(valid_genres)
+
+names_list = [
+    "Aiden", 
+    "Priya", 
+    "Santiago", 
+    "Mei", 
+    "Youssef", 
+    "Olga", 
+    "Declan", 
+    "Fatima", 
+    "Hiro", 
+    "Sofia"
+]
 
 SMART_MODEL = "gpt-4-turbo"
 FAST_MODEL = "gpt-3.5-turbo"
@@ -266,5 +282,56 @@ def _extract_titles(path_to_folder: str) -> List[str]:
                 titles_in_file = file_contents.split('\n')
                 # Extend the main titles list with the titles from this file
                 titles.extend(titles_in_file)
-    # Return the list of titles
+    # Remove duplicate titles 
+    titles = set(titles)
+    # Return the set of titles
     return titles
+
+def pick_random_name_and_capitalize(names: list) -> str:
+    """
+    Picks a random name from a provided list and returns it with the first letter capitalized.
+
+    :param names: List of names (strings)
+    :return: Randomly selected name with the first letter capitalized
+    """
+    # Ensure the list is not empty
+    if not names:
+        return "The name list is empty."
+    
+    # Pick a random name
+    random_name = random.choice(names)
+    
+    # Return the name with the first letter capitalized
+    return random_name.capitalize()
+
+# generate a string representing a synthetic booklist of unique books. Adds synthetic recommendations and an output txt file if specified. 
+def synthetic_booklist(num_books:int, openai_key:str, status:bool = False, recs:bool = False, write:bool=False) -> str: 
+    path_to_folder = repo_root/'data'/'test'/'book_titles'
+    possible_books = _extract_titles(path_to_folder)
+    num_possible_books = len(possible_books)
+    print(f"Number of possible books:{num_possible_books}")
+    
+    booklist_string = "" 
+    booklist = [] 
+    # booklist of unique books 
+    picked = random.sample(possible_books, num_books)
+    for title in tqdm(picked, "filling details"): 
+        book = Book(title)
+        book.llm_autofill(openai_key) 
+        booklist.append(book)
+    
+    for book in tqdm(booklist, "constructing lines"): 
+        # randomly pick a status if specified
+        status_string = '' if not status else random.sample({"Complete", "In Progress", "Not Started"},1)
+        # randomly add a recommender if specified 
+        recs_string = '' if not recs else random.sample({'', pick_random_name_and_capitalize(names_list)},1)
+        s = f"{book.title}:{book.blurb}\n"+f"{recs_string}, {status_string}\n"
+        booklist_string += s
+
+    # check if writing and output 
+    if write: 
+        synthetic_title = f"synthetic_booklsit_{num_books}{'r' if recs else ''}{'s' if status else ''}"
+        with open(synthetic_title, "w") as file:
+            file.write(booklist_string)
+
+    return booklist_string
