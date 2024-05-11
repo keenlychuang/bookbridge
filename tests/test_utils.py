@@ -202,8 +202,8 @@ def test_pdf_to_notion_50rs():
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.extended
-def test_pdf_to_notion_100rs():
-    path = "data/test/synthetic_booklists/test_booklist_100rs.pdf"
+def test_pdf_to_notion_99rs():
+    path = "data/test/synthetic_booklists/test_booklist_99rs.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 

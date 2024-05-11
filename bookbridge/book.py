@@ -166,7 +166,7 @@ class Book:
             f"    Recommenders: {recommenders_str}\n"
         )
 
-def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = FAST_MODEL) -> str:
+def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = SMART_MODEL) -> str:
     """
     Calls the openai llm API using a provided text prompt to generate text.
 
@@ -226,7 +226,6 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048
             frequency_penalty=frequency_penalty)
         print(f"Got resopnse! Call #:{num_calls}")
         string_response = response.choices[0].message.content
-        print(f"Last Line:{string_response.splitlines()[-1]}")
         print(f"Response Length: {len(string_response)} chars")
         # current_context_chars += len(string_response)
         responses.append(string_response) 

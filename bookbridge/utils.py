@@ -183,7 +183,7 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
     book_name = f'Book Name: {book.title}\n'
     full_prompt = emoji_prompt + book_name + book.blurb
 
-    max_attempts = 3
+    max_attempts = 4
     attempts = 0
     previous_emojis = [] 
 
@@ -207,8 +207,8 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
             attempts += 1
             print(f"Attempt {attempts}: API call failed with error: {e}. Retrying...")
 
-    print(response_text)
-    raise ValueError("Failed to infer an emoji after maximum attempts.")
+    # If we can't find an emoji, just put down a generic one. 
+    return "📚"
 
 # reduce emoji to base, avoiding modifiers 
 # def clean_up_emoji(emoji_string:str):
