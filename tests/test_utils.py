@@ -179,6 +179,53 @@ def test_force_csv_fix():
     print(formatted)
     assert is_valid_csv(formatted)
 
+@pytest.mark.extended
+def test_pdf_to_notion_15rs():
+    path = "data/test/synthetic_booklists/test_booklist_15rs.pdf"
+    notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
+    test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
+    # function call 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, openai_key)
+    # go check that the page actually contains a good booklist 
+    print(f"Go Check Out Your New Page: {url}")
+
+@pytest.mark.extended
+def test_pdf_to_notion_50rs():
+    path = "data/test/synthetic_booklists/test_booklist_50rs.pdf"
+    notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
+    test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
+    # function call 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, openai_key)
+    # go check that the page actually contains a good booklist 
+    print(f"Go Check Out Your New Page: {url}")
+
+@pytest.mark.extended
+def test_pdf_to_notion_100rs():
+    path = "data/test/synthetic_booklists/test_booklist_100rs.pdf"
+    notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
+    test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
+    # function call 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, openai_key)
+    # go check that the page actually contains a good booklist 
+    print(f"Go Check Out Your New Page: {url}")
+
+@pytest.mark.extended
+def test_pdf_to_notion_150rs():
+    path = "data/test/synthetic_booklists/test_booklist_150rs.pdf"
+    notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
+    test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
+    # function call 
+    openai_key = os.getenv('OPENAI_API_KEY')
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, openai_key)
+    # go check that the page actually contains a good booklist 
+    print(f"Go Check Out Your New Page: {url}")
+    
+    
+
+
 @pytest.mark.extended 
 def test_pdf_to_notion_40(): 
     path = "data/test/synthetic_booklists/test_booklist_40.pdf"
