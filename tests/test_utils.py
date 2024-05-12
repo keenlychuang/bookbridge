@@ -443,7 +443,7 @@ def test_find_description_short():
     bookstring = extract_text_from_pdf(path)
     openai_key = os.getenv('OPENAI_API_KEY')
     title = "Anna Karenina"
-    desc = find_description("1", bookstring, title)
+    desc = find_description("1", bookstring, title, openai_key)
     target = "\"Anna Karenina\" by Leo Tolstoy follows the tragic story of Anna, a married woman who embarks on a passionate affair with Count Vronsky, leading to societal judgment and personal turmoil. The novel explores themes of love, society, and morality in 19th-century Russia."
     assert desc == target 
 
@@ -453,7 +453,7 @@ def test_find_description_long():
     extract_text_from_pdf()
     openai_key = os.getenv('OPENAI_API_KEY')
     title = "Adventures of Huckleberry Finn"
-    desc = find_description("1", bookstring, title)
+    desc = find_description("1", bookstring, title, openai_key)
     target = "\"The Adventures of Huckleberry Finn\" follows the journey of a young boy named Huck Finn as he escapes his abusive father and embarks on a rafting adventure down the Mississippi River with a runaway slave named Jim. Along the way, they encounter various characters and face moral dilemmas, ultimately exploring themes of race, freedom, and the importance of individual conscience."
     assert desc == target 
 

@@ -114,16 +114,6 @@ def parse_csv_response(response_text: str, openai_api_key:str, document:str, aut
     books = remove_duplicate_books(books)
     return books
 
-# based on the csv bool indicating if the book has a description, either find the word for word description within the docuent or return an empty string. 
-def find_description(in_document:str, document:str, title:str) -> str: 
-    if int(in_document) != 1: 
-        return '' 
-    extra_line = f"Text title: {title}\nBook List:\n"
-    raise NotImplementedError
-    # feed prompt into fast LLM 
-    # return response 
-    
-
 def remove_duplicate_books(booklist: List[Book]) -> List[Book]:
     """
     Given a list of book instances, removes duplicate books by Book.title, which is a string.
@@ -242,68 +232,11 @@ def clean_up_emoji(emoji_string: str):
     else:
         return ''  # Return an empty string if no emoji is found
 
-# def force_csv_fix(input_string: str):
-#     """
-#     Attempts to fix the input string into a csv format by ensuring the correct number of fields per line,
-#     ignoring commas within quoted strings.
-#     """
-
-#     #TODO DEBUGGING write to file 
-#     with open("before_procoessing.csv", "w")as file: 
-#         file.write(input_string)
-
-#     lines = input_string.strip().split('\n')
-#     num_fields = lines[0].count(',') + 1  # Assumes the header has the correct number of fields
-
-#     corrected_lines = []
-
-#     for line in lines:
-#         corrected_line = ''
-#         field = ''
-#         num_commas = 0
-#         in_quotes = False
-#         for char in line:
-#             if char == '"' and not in_quotes:
-#                 # Entering a quoted string
-#                 in_quotes = True
-#             elif char == '"' and in_quotes:
-#                 # Exiting a quoted string
-#                 in_quotes = False
-#             if char == ',' and not in_quotes:
-#                 # Count commas only when not in quotes
-#                 num_commas += 1
-#                 corrected_line += field + char
-#                 field = ''
-#             else:
-#                 field += char
-#         corrected_line += field  # Add the last field
-
-#         # Add missing commas if necessary, remove if necessary
-#         missing_commas = (num_fields - 1) - num_commas
-#         if missing_commas > 0: 
-#             corrected_line += ',' * missing_commas
-#         elif missing_commas <0: 
-#             corrected_line = corrected_line[:missing_commas]
-
-#         corrected_lines.append(corrected_line)
-
-#     # Join the corrected lines into a single string to be returned
-#     corrected_csv = '\n'.join(corrected_lines)
-
-#     #TODO DEBUGGING write to file 
-#     with open("after_processing.csv", "w") as processed: 
-#         processed.write(corrected_csv)
-
-#     return corrected_csv
-
 def force_csv_fix(input_string: str):
     """
     Attempts to fix the input string into a CSV format by ensuring the correct number of fields per line,
-    ignoring commas within quoted strings, and ensuring the summary field is enclosed in quotes.
+    ignoring commas within quoted strings. The summary field (or any field) will not be forcibly enclosed in quotes.
     """
-    #TODO DEBUGGING write to file 
-    with open("before_procoessing.csv", "w")as file: 
-        file.write(input_string)
 
     lines = input_string.strip().split('\n')
     num_fields = lines[0].count(',') + 1  # Assumes the header has the correct number of fields
@@ -330,14 +263,9 @@ def force_csv_fix(input_string: str):
             else:
                 field += char
 
-        # Check if the last field (summary) is properly enclosed in quotes
-        if field and (not field.startswith('"') or not field.endswith('"')):
-            # Enclose the field in quotes and escape existing quotes within the field
-            field = '"' + field.replace('"', '""') + '"'
+        # Do not force the last field to be enclosed in quotes
+        corrected_line += field  # Add the last field directly without modifying it
 
-        corrected_line += field  # Add the last field
-
-        # Add or remove missing commas if necessary
         missing_commas = (num_fields - 1) - num_commas
         if missing_commas > 0:
             corrected_line += ',' * missing_commas
@@ -346,12 +274,7 @@ def force_csv_fix(input_string: str):
 
         corrected_lines.append(corrected_line)
 
-    # Join the corrected lines into a single string to be returned
     corrected_csv = '\n'.join(corrected_lines)
-
-    #TODO DEBUGGING write to file 
-    with open("after_processing.csv", "w") as processed: 
-        processed.write(corrected_csv)
 
     return corrected_csv
 

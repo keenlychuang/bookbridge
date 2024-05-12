@@ -239,6 +239,19 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048
     output = "".join(responses)
     return output 
 
+# based on the csv bool indicating if the book has a description, either find the word for word description within the docuent or return an empty string. 
+def find_description(in_document:str, document:str, title:str, openai_api_key:str) -> str: 
+    if int(in_document) != 1: 
+        return '' 
+    extra_line = f"Text title: {title}\nBook List:\n"
+    with open(prompts_path/'find_description.txt', 'r') as file:
+        desc_prompt = file.read() 
+    full_prompt = desc_prompt + extra_line + document
+    output = llm_api_call(full_prompt, openai_api_key, model=FAST_MODEL)
+    #optionally try multiple times 
+    return output 
+    
+
 def sample_book(openai_api_key:str) -> Book:
     """
     Returns a sample Book object with non-emoji parameters autofilled 
