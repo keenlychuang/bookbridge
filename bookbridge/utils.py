@@ -75,7 +75,7 @@ def pdf_to_booklist(path:str, openai_api_key:str):
     #parse_response
     return parse_csv_response(csv, openai_api_key, bookstring)
 
-def parse_csv_response(response_text: str, openai_api_key:str, document:str, autofill:bool = False) -> List[Book]:
+def parse_csv_response(response_text: str, openai_api_key:str, document:str, autofill:bool = True) -> List[Book]:
     """
     Parses the response text from an API call into a list of Book instances.
 
@@ -103,7 +103,7 @@ def parse_csv_response(response_text: str, openai_api_key:str, document:str, aut
         recs = recs.split("/")
         recs = list(filter(lambda recommendation: True if recommendation != '' else False, recs))
         # finding the blurb 
-        blurb = find_description(blurb, document, title)
+        blurb = find_description(blurb, document, title, openai_api_key)
         book = Book(title, author, genre, status, blurb, rating, recs) 
         books.append(book)
     if autofill:
@@ -160,7 +160,7 @@ def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page
     url = create_booklist_database(parent_page=parent_page, notion_key=notion_key) 
     database_id = search_notion_id(url)
     # for each book in booklist, add page 
-    for book in tqdm(booklist, "converting to notion"):
+    for book in tqdm(booklist, "Converting to Notion"):
         page_id = add_booklist_page(book, database_id, notion_key=notion_key, openai_api_key= openai_api_key)
     return url
  
@@ -210,6 +210,7 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
             print(f"Attempt {attempts}: API call failed with error: {e}. Retrying...")
 
     # If we can't find an emoji, just put down a generic one. 
+    print(f"Failed to find emoji, defaulting on 📚...")
     return "📚"
 
 # reduce emoji to base, avoiding modifiers 
@@ -237,6 +238,9 @@ def force_csv_fix(input_string: str):
     Attempts to fix the input string into a CSV format by ensuring the correct number of fields per line,
     ignoring commas within quoted strings. The summary field (or any field) will not be forcibly enclosed in quotes.
     """
+
+    with open('before_processing.csv', 'w') as file:
+        file.write(input_string)
 
     lines = input_string.strip().split('\n')
     num_fields = lines[0].count(',') + 1  # Assumes the header has the correct number of fields
@@ -275,6 +279,9 @@ def force_csv_fix(input_string: str):
         corrected_lines.append(corrected_line)
 
     corrected_csv = '\n'.join(corrected_lines)
+
+    with open('after_processing.csv', 'w') as file:
+        file.write(corrected_csv)
 
     return corrected_csv
 

@@ -2,7 +2,15 @@ I have a document containing a booklist with titles, and sometimes authors, stat
 Now, I need to retrieve descriptions for certain books where the initial extraction might not have captured the description accurately or at all. 
 
 Based on this information, could you locate and provide the full description of this book as it appears in the document? 
-Please ensure the description is complete and accurately reflects what is contained in the document. Only output the description, without any other text or commentary. 
-If the description cannot be found, just output an empt line. 
+Please ensure the description is complete and accurately reflects what is contained in the document. Only output the description, without any other commentary. 
+Make sure you output the description word-for-word, or verbatim, exactly as it appears. 
+If the description cannot be found, just output an empty line. 
+For example, say you found the following description in the document: 
+
+Ishmael:"Ishmael" is a philosophical novel by Daniel Quinn that explores the idea of civilization and humanity's place in the world through a series of dialogues between a man and a telepathic gorilla.
+
+You would simply output: 
+
+"Ishmael" is a philosophical novel by Daniel Quinn that explores the idea of civilization and humanity's place in the world through a series of dialogues between a man and a telepathic gorilla.
 
 Here is the book information: 
