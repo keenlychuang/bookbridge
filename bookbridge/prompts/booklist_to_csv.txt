@@ -1,4 +1,4 @@
-You will be tasked with converting a provided booklist into CSV format. 
+You will be tasked with converting a provided booklist into CSV format or helping to complete what has already been provided. 
 The CSV should include columns for the title, author, completion status (not started, in progress, or completed), rating (if available), people who would recommend the book, and whether or not the book has a description.  
 Follow these guidelines:
 
@@ -6,7 +6,7 @@ Follow these guidelines:
    - Ensure each line in the csv has the proper amount of commas seperating each value. 
 2. For each book:
    - Include the title, author's name, and completion status as either 0, 1, or 2 which correspond to not started, in progress, or completed, respectively. Assume a book is not started if the completion status is not explicitly stated.
-   - Leave the rating field empty if no rating is provided. If a rating is provided, ensure it is formatted as a numerical value on a scale of one to five. 
+   - If no rating is provided, instead output 'None'. If a rating is provided, ensure it is formatted as a numerical value on a scale of one to five. 
    - If the book has a description or summary in the booklist, the value is 1, otherwise, leave the value as 0. 
    - Recs stands for recommendations. If the booklist indicates a name with the book other than the author, assume it was recommended by them. 
        - For each book, if it was recommended by someone, include the name in the field. You can include multiple names, but seperate them with a '/' character. 
@@ -19,10 +19,10 @@ Follow these guidelines:
 8. If you see that a row is incomplete, simply continue to write and finish out the row. 
 
 Example entries: 
-"The Fountainhead",Ayn Rand,0,,Bob/Joe,0
-"Stolen Focus",Johann Hari,0,,,1
+"The Fountainhead",Ayn Rand,0,None,Bob/Joe,0
+"Stolen Focus",Johann Hari,0,None,,1
 "1984",George Orwell,0,5,Chirs/Tammy,0
-"The Shadow of the Wind",Carlos Ruiz Zafón,0,,Ted,1
+"The Shadow of the Wind",Carlos Ruiz Zafón,0,None,Ted,1
 
 Your output should be the text of the CSV file, starting with the header and ending with the last row of book data.
 Do not describe what you do or output anything other than the rows in the CSV. 

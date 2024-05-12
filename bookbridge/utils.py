@@ -103,7 +103,7 @@ def parse_csv_response(response_text: str, openai_api_key:str, document:str, aut
         title, author, status, rating, recs, blurb = row  # Unpacking row values
         # chagne from status string. Expecting status as 0,1,2
         status = BookStatus.from_int(int(status))
-        rating = float(rating) if rating else None  
+        rating = float(rating) if rating!= "None" else None  
         genre = None 
         # unpacking recs 
         recs = recs.split("/")
