@@ -5,12 +5,36 @@ Based on this information, could you locate and provide the full description of 
 Please ensure the description is complete and accurately reflects what is contained in the document. Only output the description, without any other commentary. 
 Make sure you output the description word-for-word, or verbatim, exactly as it appears. 
 If the description cannot be found, just output an empty line. 
-For example, say you found the following description in the document: 
+For example, say you were presented with the following document: 
 
 Ishmael:"Ishmael" is a philosophical novel by Daniel Quinn that explores the idea of civilization and humanity's place in the world through a series of dialogues between a man and a telepathic gorilla.
+Brave New World by Aldous Huxley - A vision of a dystopian future where society is controlled by advanced technology and genetic engineering. 
+"To Kill a Mockingbird" by Harper Lee - Through the eyes of Scout Finch, this novel explores racial injustice and moral growth in the American South during the 1930s.
+"The Brothers Karamazov" by Fyodor Dostoevsky - A philosophical novel exploring the complexities of faith, morality, and human nature through the lives of the Karamazov brothers.
+Trauma, the Invisible Epidemic: Examines the profound impact of trauma on individual and societal health, advocating for greater understanding and compassionate approaches to healing.
 
-You would simply output: 
+If prompted with the information: 
+
+Book Title: Ishmael 
+
+You would respond: 
 
 "Ishmael" is a philosophical novel by Daniel Quinn that explores the idea of civilization and humanity's place in the world through a series of dialogues between a man and a telepathic gorilla.
+
+If prompted with the information: 
+
+Book Title: Trauma, the Invisible Epidemic
+
+You would respond: 
+
+Examines the profound impact of trauma on individual and societal health, advocating for greater understanding and compassionate approaches to healing.
+
+If you were prompted with the information: 
+
+Book Title: Brave New World 
+
+You would respond: 
+
+A vision of a dystopian future where society is controlled by advanced technology and genetic engineering. 
 
 Here is the book information: 

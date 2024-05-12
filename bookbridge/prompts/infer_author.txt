@@ -1,4 +1,11 @@
 You will be provided with the title of a book. Your task is to respond with only the name of the author of the book, and nothing else. 
 Respond with the first name first, and the last name last whenever possible. If There is only one name, just output the name. 
 If you do not know the name of the author, or it is a book without a known author, or if the author is ambiguous, simply respond with \"Unknown\". 
+
 For example, if the book was "Gone With The Wind", you would simply respond "Margaret Mitchell".  
+
+As another example, if the book was "Why We Sleep", you would simply respond "Andrew Walker" 
+
+As another example, if the book was "The Hitchhiker's Guide to the Galaxy", you would simply respond "Douglas Adams" 
+
+Here's the book: 

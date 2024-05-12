@@ -28,6 +28,7 @@ Example entries:
 "The Shadow of the Wind",Carlos Ruiz Zafón,0,,Ted,1
 
 Your output should be the text of the CSV file, starting with the header and ending with the last row of book data.
-Make sure not to include the opening or closing ``` characters
+Do not describe what you do or output anything other than the rows in the CSV. 
+Make sure not to include the opening or closing backtick characters
 
 Here is the booklist: 

@@ -58,22 +58,28 @@ def count_columns(row):
             column_count += 1
     return column_count + 1  # Add one because column count is one more than comma count
 
-def pdf_to_booklist(path:str, openai_api_key:str): 
+def pdf_to_booklist(path:str, openai_api_key:str, max_attempts:int=2): 
     #pdf to string
     bookstring = extract_text_from_pdf(path)
     #string to csv 
     print("Restructuring your booklist...")
-    csv = bookstring_to_csv(bookstring, openai_api_key)
+    attempts = 0 
 
-    # try fixing if needed 
-    csv = force_csv_fix(csv)
-    try:
-        assert is_valid_csv(csv)
-    except:
-        print(csv)
-        raise ValueError("Invalid CSV")
+### Try multiple times 
+    while attempts <= max_attempts: 
+        attempts +=1 
+        csv = bookstring_to_csv(bookstring, openai_api_key)
+        csv = force_csv_fix(csv)
+        if is_valid_csv(csv):
+            break 
+        print(f"{attempts} csv conversion attempts failed, retrying")
+
+    assert attempts <= max_attempts, f"Failed to convert CSV after {attempts} attempts!"
     #parse_response
+    print("Converted to a CSV!")
     return parse_csv_response(csv, openai_api_key, bookstring)
+
+### 
 
 def parse_csv_response(response_text: str, openai_api_key:str, document:str, autofill:bool = True) -> List[Book]:
     """
@@ -183,6 +189,7 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
     with open(prompts_path/ 'request_emoji.txt', 'r') as file:
         emoji_prompt = file.read()
     book_name = f'Book Name: {book.title}\n'
+    book_blurb = f'Book Description: {book.blurb}\n' if (book.blurb != None and book.blurb != "") else '' 
     full_prompt = emoji_prompt + book_name + book.blurb
 
     max_attempts = 4
@@ -248,6 +255,8 @@ def force_csv_fix(input_string: str):
     corrected_lines = []
 
     for line in lines:
+        if "```" in line: 
+            continue 
         corrected_line = ''
         field = ''
         num_commas = 0

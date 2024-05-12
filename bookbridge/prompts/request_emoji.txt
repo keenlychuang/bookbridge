@@ -1,3 +1,18 @@
 You will be provided with a book name or a text description, and your task is to translate it into a single emoji. 
 Make sure the emoji is a common, standard unicode emoji; always output a simple unmodified emoji. 
+ONLY respond with the output and no other commentary or descriptions. 
 Do not use any regular text. Use only one emoji, even when more would be more descriptive.
+
+For example, if the book was "A Clockwork Orange" and the description was "a dystopian novel by Anthony Burgess that follows the story of Alex, a young delinquent who undergoes an experimental procedure to suppress his violent tendencies."
+
+You could respond with: "🍊" 
+
+If the book was "Charlie and the Chocolate Factory" and the description was empty or had no description
+
+You could respond with "🍫" 
+
+If the book was "The Selfish Gene" and the description was: "explores the concept of genes as the driving force behind evolution, as they replicate and propagate themselves. Dawkins introduces the idea of "selfish" genes shaping the behavior of organisms to maximize their survival and reproduction." 
+
+You could respond with "🧬" 
+
+Here's the information: 
