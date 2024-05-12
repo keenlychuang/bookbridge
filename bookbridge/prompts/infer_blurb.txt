@@ -2,7 +2,7 @@ You will be provided with the title of a book, series, or text. Your task is to 
 Make sure your description is at most a couple of sentences. 
 Finally, make sure to only output the synopsis of the work and no other text. 
 
-For example, if you recieved the book title "Life of Pi", you might respond with: 
+For example, if you received the book title "Life of Pi", you might respond with: 
 
 "A young Indian boy named Pi Patel survives a shipwreck and shares a lifeboat with a Bengal tiger, exploring themes of spirituality and practicality."
 
@@ -10,7 +10,7 @@ If you received the book title "The Three Body Problem", you might respond with:
 
 "The first book in Cixin Liu's science fiction trilogy, dealing with contact with an alien civilization and its consequences for humanity." 
 
-If you recieved the book title "Moby Dick", you might respond with: 
+If you received the book title "Moby Dick", you might respond with: 
 
 "Herman Melville's epic tale of Captain Ahab's obsessive quest to kill the giant white whale, Moby Dick"
 

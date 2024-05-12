@@ -41,8 +41,8 @@ names_list = [
     "Sofia"
 ]
 
-SMART_MODEL = "gpt-4-turbo"
-FAST_MODEL = "gpt-3.5-turbo"
+GPT_SMART_MODEL = "gpt-4-turbo"
+GPT_FAST_MODEL = "gpt-3.5-turbo"
 
 # Enum for possible states of book completion, for readability 
 class BookStatus(Enum):
@@ -112,7 +112,7 @@ class Book:
             with open(prompts_path/'infer_author.txt', 'r') as file:
                 author_prompt = file.read() 
             prompt = author_prompt + f"\n\n{self.title}"
-            author_string = llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=FAST_MODEL)
+            author_string = llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=GPT_FAST_MODEL)
             self.author = author_string 
         #fill genre 
         if self.genre is None: 
@@ -126,7 +126,7 @@ class Book:
             with open(prompts_path/'infer_blurb.txt', 'r') as file:
                 blurb_prompt = file.read() 
             prompt = blurb_prompt + f"\n\n{self.title}"
-            blurb_string =llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=FAST_MODEL)
+            blurb_string =llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=GPT_FAST_MODEL)
             self.blurb = blurb_string
     
     def update_rating_selection(self) -> None: 
@@ -166,7 +166,7 @@ class Book:
             f"    Recommenders: {recommenders_str}\n"
         )
 
-def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = SMART_MODEL) -> str:
+def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = GPT_SMART_MODEL) -> str:
     """
     Calls the openai llm API using a provided text prompt to generate text.
 
@@ -197,7 +197,7 @@ def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temper
     string_response = response.choices[0].message.content
     return string_response
 
-def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = SMART_MODEL, max_calls:int = 5) -> str:
+def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = GPT_SMART_MODEL, max_calls:int = 5) -> str:
     """
     Chained implementation of the llm api call for long outputs. Iteratively feeds output of an llm api call back into the model until the output is complete.  
     """
@@ -214,9 +214,6 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048
 
     while finish != 'stop' and num_calls < max_calls: 
         num_calls += 1 
-        # if current_context_chars > max_fast_model_context:
-        #     model = SMART_MODEL
-        #     print("Swapped to larger model for increased context")
         print("Calling Model...")
         response = client.chat.completions.create(
             model=model,
