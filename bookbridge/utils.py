@@ -73,9 +73,9 @@ def pdf_to_booklist(path:str, openai_api_key:str):
         print(csv)
         raise ValueError("Invalid CSV")
     #parse_response
-    return parse_csv_response(csv, openai_api_key)
+    return parse_csv_response(csv, openai_api_key, bookstring)
 
-def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = True) -> List[Book]:
+def parse_csv_response(response_text: str, openai_api_key:str, document:str, autofill:bool = False) -> List[Book]:
     """
     Parses the response text from an API call into a list of Book instances.
 
@@ -94,7 +94,7 @@ def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = T
     #skip first row 
     next(reader,None)
     for row in tqdm(reader, "Processing Rows"):
-        title, author, status, rating, recs,blurb = row  # Unpacking row values
+        title, author, status, rating, recs, blurb = row  # Unpacking row values
         # chagne from status string. Expecting status as 0,1,2
         status = BookStatus.from_int(int(status))
         rating = float(rating) if rating else None  
@@ -102,6 +102,8 @@ def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = T
         # unpacking recs 
         recs = recs.split("/")
         recs = list(filter(lambda recommendation: True if recommendation != '' else False, recs))
+        # finding the blurb 
+        blurb = find_description(blurb, document, title)
         book = Book(title, author, genre, status, blurb, rating, recs) 
         books.append(book)
     if autofill:
@@ -111,6 +113,16 @@ def parse_csv_response(response_text: str, openai_api_key:str, autofill:bool = T
     # remove duplicates 
     books = remove_duplicate_books(books)
     return books
+
+# based on the csv bool indicating if the book has a description, either find the word for word description within the docuent or return an empty string. 
+def find_description(in_document:str, document:str, title:str) -> str: 
+    if int(in_document) != 1: 
+        return '' 
+    extra_line = f"Text title: {title}\nBook List:\n"
+    raise NotImplementedError
+    # feed prompt into fast LLM 
+    # return response 
+    
 
 def remove_duplicate_books(booklist: List[Book]) -> List[Book]:
     """

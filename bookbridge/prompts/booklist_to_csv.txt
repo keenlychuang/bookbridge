@@ -1,5 +1,5 @@
 You will be tasked with converting a provided booklist into CSV format. 
-The CSV should include columns for the title, author, completion status (not started, in progress, or completed), rating (if available), people who would recommend the book. and a brief summary or blurb of the book. 
+The CSV should include columns for the title, author, completion status (not started, in progress, or completed), rating (if available), people who would recommend the book, and whether or not the book has a description.  
 Follow these guidelines:
 
 1. Begin your CSV with a header row as follows: title,author,completed,rating,recs,summary
@@ -8,12 +8,12 @@ Follow these guidelines:
 2. For each book:
    - Include the title, author's name, and completion status as either 0, 1, or 2 which correspond to not started, in progress, or completed, respectively. Assume a book is not started if the completion status is not explicitly stated.
    - Leave the rating field empty if no rating is provided. If a rating is provided, ensure it is formatted as a numerical value on a scale of one to five. 
-   - Include a summary only if provided in the booklist. Leave this field empty otherwise.
+   - If the book has a description or summary in the booklist, the value is 1, otherwise, leave the value as 0. 
    - Recs stands for recommendations. If the booklist indicates a name with the book other than the author, assume it was recommended by them. 
        - For each book, if it was recommended by someone, include the name in the field. You can include multiple names, but seperate them with a '/' character. 
        - If there was no recommendation, simply leave the field blank. 
 
-3. For the title and summary fields, which sometimes contain commas, enclose the entire field in double quotes. If a field contains double quotes, escape these by doubling them (e.g., a quote `"` becomes two quotes `""`).
+3. For the title, which sometimes contain commas, enclose the entire field in double quotes. If a field contains double quotes, escape these by doubling them (e.g., a quote `"` becomes two quotes `""`).
 
 4. Try to ensure all rows, including the header, have the same number of fields, using commas to delimit fields. If a field is empty, include the comma but leave the space between commas empty (e.g., `,,` for two consecutive empty fields).
 
@@ -22,10 +22,10 @@ Follow these guidelines:
 6. Each entry in the CSV should represent one book, with fields separated by commas and each book on a new line.
 
 Example entries: 
-"The Fountainhead",Ayn Rand,0,,Bob/Joe,"A novel about an individualistic young architect's struggle against traditional standards and his pursuit of creative freedom"
-"Stolen Focus",Johann Hari,0,,,
-"1984",George Orwell,0,5,Chirs/Tammy,"A dystopian novel that explores the dangers of totalitarianism."
-"The Shadow of the Wind",Carlos Ruiz Zafón,0,,Ted,"A captivating tale set in post-war Barcelona, blending mystery, romance, and history as a young boy discovers a hidden library of forgotten books."
+"The Fountainhead",Ayn Rand,0,,Bob/Joe,0
+"Stolen Focus",Johann Hari,0,,,1
+"1984",George Orwell,0,5,Chirs/Tammy,0
+"The Shadow of the Wind",Carlos Ruiz Zafón,0,,Ted,1
 
 Your output should be the text of the CSV file, starting with the header and ending with the last row of book data.
 Make sure not to include the opening or closing ``` characters

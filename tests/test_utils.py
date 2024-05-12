@@ -437,5 +437,25 @@ def test_search_notion_id_with_incomplete_url():
     actual_id = search_notion_id("https://www.notion.so")
     assert actual_id is None, "Expected to get None for an incomplete URL."
 
+@pytest.mark.doc 
+def test_find_description_short():
+    path = "data/test/synthetic_booklists/test_booklist_15rs.pdf"
+    bookstring = extract_text_from_pdf(path)
+    openai_key = os.getenv('OPENAI_API_KEY')
+    title = "Anna Karenina"
+    desc = find_description("1", bookstring, title)
+    target = "\"Anna Karenina\" by Leo Tolstoy follows the tragic story of Anna, a married woman who embarks on a passionate affair with Count Vronsky, leading to societal judgment and personal turmoil. The novel explores themes of love, society, and morality in 19th-century Russia."
+    assert desc == target 
+
+@pytest.mark.doc
+def test_find_description_long():
+    path =  "data/test/synthetic_booklists/test_booklist_99rsrs.pdf"
+    extract_text_from_pdf()
+    openai_key = os.getenv('OPENAI_API_KEY')
+    title = "Adventures of Huckleberry Finn"
+    desc = find_description("1", bookstring, title)
+    target = "\"The Adventures of Huckleberry Finn\" follows the journey of a young boy named Huck Finn as he escapes his abusive father and embarks on a rafting adventure down the Mississippi River with a runaway slave named Jim. Along the way, they encounter various characters and face moral dilemmas, ultimately exploring themes of race, freedom, and the importance of individual conscience."
+    assert desc == target 
+
 if __name__ == "__main__":
     pytest.main()
