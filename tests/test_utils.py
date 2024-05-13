@@ -68,11 +68,29 @@ def test_llm_api_call():
     print(f"llm api call produced the following test response:\n{response}")
     assert isinstance(response, str)
 
+@pytest.mark.anthropic
+def test_anthropic_api_call(): 
+    prompt = "Your task to return a critique of surveillance captialism and its impact on society."
+    anthropic_key = os.getenv("ANTHROPIC_KEY")
+    response = anthropic_api_call(prompt, anthropic_key, model=CLAUDE_SMALL_MODEL)
+    print(f"llm api call produced the following test response:\n{response}")
+    assert isinstance(response, str)
+
+@pytest.mark.anthropic
+def test_anthropic_api_call_chained(): 
+    prompt = "Your task is to generate a booklist of 50 books, each with an author and short description." 
+    anthropic_key = os.getenv("ANTHROPIC_KEY")
+    response = anthropic_api_call(prompt, anthropic_key, max_tokens=512, model=CLAUDE_SMALL_MODEL)
+    print(f"llm api call produced the following test response:\n{response}")
+    assert isinstance(response, str)
+    count_tokens = lambda s: len(s)//4 
+    assert count_tokens(response) > 512
+
 @pytest.mark.extended
 def test_llm_api_call_chained(): 
     prompt = "Your task is to generate a booklist of 50 books, each with an author and short description."
     openai_key = os.getenv('OPENAI_API_KEY')
-    response = llm_api_call_chained(prompt, openai_key, max_tokens=512, model=FAST_MODEL)
+    response = llm_api_call_chained(prompt, openai_key, max_tokens=512, model=GPT_FAST_MODEL)
     # assume each token on average is about 4 characters 
     count_tokens = lambda s: len(s)//4 
     assert count_tokens(response) > 512

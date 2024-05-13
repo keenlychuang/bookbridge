@@ -21,14 +21,14 @@ prompts_path = package_root / "prompts"
 
 load_dotenv() 
 
-def bookstring_to_csv(bookstring:str, openai_api_key:str)-> str: 
+def bookstring_to_csv(bookstring:str, anthropic_key:str)-> str: 
     """
     Parses the raw string text from a booklist into a csv format
     """
     with open(prompts_path / 'booklist_to_csv.txt', 'r') as file: 
         processing_prompt = file.read() 
     prompt_full = processing_prompt + bookstring
-    csv_formatted = llm_api_call_chained(prompt_full, openai_api_key)
+    csv_formatted = anthropic_api_call(prompt_full, anthropic_key)
     print("Reformatted booklist...")
     return csv_formatted
 
@@ -58,7 +58,7 @@ def count_columns(row):
             column_count += 1
     return column_count + 1  # Add one because column count is one more than comma count
 
-def pdf_to_booklist(path:str, openai_api_key:str, max_attempts:int=2): 
+def pdf_to_booklist(path:str, anthropic_key:str, max_attempts:int=2): 
     #pdf to string
     bookstring = extract_text_from_pdf(path)
     #string to csv 
@@ -68,7 +68,7 @@ def pdf_to_booklist(path:str, openai_api_key:str, max_attempts:int=2):
 ### Try multiple times 
     while attempts <= max_attempts: 
         attempts +=1 
-        csv = bookstring_to_csv(bookstring, openai_api_key)
+        csv = bookstring_to_csv(bookstring, anthropic_key)
         csv = force_csv_fix(csv)
         if is_valid_csv(csv):
             break 
@@ -77,11 +77,11 @@ def pdf_to_booklist(path:str, openai_api_key:str, max_attempts:int=2):
     assert attempts <= max_attempts, f"Failed to convert CSV after {attempts} attempts!"
     #parse_response
     print("Converted to a CSV!")
-    return parse_csv_response(csv, openai_api_key, bookstring)
+    return parse_csv_response(csv, anthropic_key, bookstring)
 
 ### 
 
-def parse_csv_response(response_text: str, openai_api_key:str, document:str, autofill:bool = True) -> List[Book]:
+def parse_csv_response(response_text: str, anthropic_key:str, document:str, autofill:bool = True) -> List[Book]:
     """
     Parses the response text from an API call into a list of Book instances.
 
@@ -109,12 +109,12 @@ def parse_csv_response(response_text: str, openai_api_key:str, document:str, aut
         recs = recs.split("/")
         recs = list(filter(lambda recommendation: True if recommendation != '' else False, recs))
         # finding the blurb 
-        blurb = find_description(blurb, document, title, openai_api_key)
+        blurb = find_description(blurb, document, title, anthropic_key)
         book = Book(title, author, genre, status, blurb, rating, recs) 
         books.append(book)
     if autofill:
         for book in tqdm(books, "autofilling fields"):
-            book.llm_autofill(openai_api_key)
+            book.llm_autofill(anthropic_key)
     
     # remove duplicates 
     books = remove_duplicate_books(books)
@@ -149,7 +149,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
             text += page.get_text()
     return text
 
-def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page: str, openai_api_key:str): 
+def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page: str, anthropic_key:str): 
     """ 
     Given a list of Books, creates a Notion Database with entries corresponding to each book.
 
@@ -167,11 +167,11 @@ def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page
     database_id = search_notion_id(url)
     # for each book in booklist, add page 
     for book in tqdm(booklist, "Converting to Notion"):
-        page_id = add_booklist_page(book, database_id, notion_key=notion_key, openai_api_key= openai_api_key)
+        page_id = add_booklist_page(book, database_id, notion_key=notion_key, anthropic_key= anthropic_key)
     return url
  
 
-def infer_emoji(book: Book, openai_api_key:str) -> str:
+def infer_emoji(book: Book, anthropic_key:str) -> str:
     """
     Uses an LLM API call to infer an appropriate emoji representing the book
 
@@ -184,7 +184,7 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
     Attempts the API call up to three times if necessary.
     """
     # Fill book if not already complete
-    book.llm_autofill(openai_api_key)
+    book.llm_autofill(anthropic_key)
     # Construct prompt
     with open(prompts_path/ 'request_emoji.txt', 'r') as file:
         emoji_prompt = file.read()
@@ -202,9 +202,9 @@ def infer_emoji(book: Book, openai_api_key:str) -> str:
             if attempts > 0: 
                 exclude_text = f'Do not use the following emojis:{previous_emojis}\n'
                 new_prompt = full_prompt + exclude_text
-                response_text = clean_up_emoji(llm_api_call_chained(new_prompt, openai_api_key))
+                response_text = clean_up_emoji(anthropic_api_call(new_prompt, anthropic_key))
             else: 
-                response_text = clean_up_emoji(llm_api_call(full_prompt, openai_api_key))
+                response_text = clean_up_emoji(anthropic_api_call(full_prompt, anthropic_key))
             # Quality check
             if valid_emoji(response_text):
                 return response_text
@@ -399,7 +399,7 @@ def create_booklist_database(parent_page: str, notion_key:str) -> str:
     #return url
     return response['url']
 
-def add_booklist_page(book: Book, database_id: str, notion_key: str, openai_api_key:str) -> str: 
+def add_booklist_page(book: Book, database_id: str, notion_key: str, anthropic_key:str) -> str: 
     """
     Adds a row to the database representing the booklist in Notion, cooresponding to the supplied Book. 
 
@@ -413,7 +413,7 @@ def add_booklist_page(book: Book, database_id: str, notion_key: str, openai_api_
     # create client 
     notion = Client(auth=notion_key)
     parent= {"database_id":database_id}
-    icon = infer_emoji(book, openai_api_key)
+    icon = infer_emoji(book, anthropic_key)
     status_name = str(book.status)
 
     properties = {
@@ -532,7 +532,7 @@ def extract_emojis(text:str) -> dict:
 
     return matches 
 
-def pdf_to_notion(path:str, parent_page:str, notion_key:str, openai_api_key:str) -> str: 
+def pdf_to_notion(path:str, parent_page:str, notion_key:str, anthropic_key:str) -> str: 
     """
     Given the str path to a pdf containing a booklist, attempt to convert the booklist to a new notion database and return the database id. 
 
@@ -546,8 +546,8 @@ def pdf_to_notion(path:str, parent_page:str, notion_key:str, openai_api_key:str)
     """
     # pdf to python list 
     print("Reading through your booklist...")
-    booklist = pdf_to_booklist(path, openai_api_key)
+    booklist = pdf_to_booklist(path, anthropic_key)
     # python list to notion 
     print("Creating a Notion page for you...")
-    url = python_to_notion_database(notion_key, booklist, parent_page, openai_api_key)
+    url = python_to_notion_database(notion_key, booklist, parent_page, anthropic_key)
     return url

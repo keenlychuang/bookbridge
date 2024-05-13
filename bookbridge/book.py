@@ -1,5 +1,6 @@
 import random
 import os
+import anthropic
 from tqdm import tqdm 
 from typing import Literal, Optional, List
 from dotenv import load_dotenv
@@ -43,6 +44,8 @@ names_list = [
 
 GPT_SMART_MODEL = "gpt-4-turbo"
 GPT_FAST_MODEL = "gpt-3.5-turbo"
+CLAUDE_SMALL_MODEL = "claude-3-haiku-20240307"
+CLAUDE_MED_MODEL = "claude-3-sonnet-20240229"
 
 # Enum for possible states of book completion, for readability 
 class BookStatus(Enum):
@@ -96,7 +99,7 @@ class Book:
 
         self.update_rating_selection() 
 
-    def llm_autofill(self, openai_api_key) -> str:
+    def llm_autofill(self, anthropic_key) -> str:
         """
         Automatically fills missing fields of the book instance using a language model API.
 
@@ -112,21 +115,21 @@ class Book:
             with open(prompts_path/'infer_author.txt', 'r') as file:
                 author_prompt = file.read() 
             prompt = author_prompt + f"\n\n{self.title}"
-            author_string = llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=GPT_FAST_MODEL)
+            author_string = anthropic_api_call(prompt=prompt, anthropic_key=anthropic_key, model=CLAUDE_SMALL_MODEL)
             self.author = author_string 
         #fill genre 
         if self.genre is None: 
             with open(prompts_path/'infer_genre.txt', 'r') as file:
                 genre_prompt = file.read() 
             prompt = genre_prompt + f"\n{valid_genres_string}\n\n{self.title}"
-            genre_string = llm_api_call(prompt=prompt, openai_api_key= openai_api_key)
+            genre_string = anthropic_api_call(prompt=prompt, anthropic_key= anthropic_key)
             self.genre = genre_string
         #fill blurb 
         if self.blurb is None: 
             with open(prompts_path/'infer_blurb.txt', 'r') as file:
                 blurb_prompt = file.read() 
             prompt = blurb_prompt + f"\n\n{self.title}"
-            blurb_string =llm_api_call(prompt=prompt, openai_api_key= openai_api_key, model=GPT_FAST_MODEL)
+            blurb_string =anthropic_api_call(prompt=prompt, anthropic_key= anthropic_key, model=CLAUDE_SMALL_MODEL)
             self.blurb = blurb_string
     
     def update_rating_selection(self) -> None: 
@@ -166,7 +169,8 @@ class Book:
             f"    Recommenders: {recommenders_str}\n"
         )
 
-def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = GPT_SMART_MODEL) -> str:
+
+def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.5, frequency_penalty:float = 0.0, model:str = GPT_SMART_MODEL) -> str:
     """
     Calls the openai llm API using a provided text prompt to generate text.
 
@@ -187,7 +191,7 @@ def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temper
     client.api_key = openai_api_key 
     gpt_role_prompt = "You are an AI assistant that can help with a variety of tasks."  
     gpt_user_prompt = prompt
-    combined_prompt=[{"role": "assistant", "content": gpt_role_prompt}, {"role": "user", "content": gpt_user_prompt}]
+    combined_prompt=[{"role": "system", "content": gpt_role_prompt}, {"role": "user", "content": gpt_user_prompt}]
     response = client.chat.completions.create(
         model=model,
         messages = combined_prompt,
@@ -197,7 +201,7 @@ def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temper
     string_response = response.choices[0].message.content
     return string_response
 
-def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048, temperature: float = 0.7, frequency_penalty:float = 0.0, model:str = GPT_SMART_MODEL, max_calls:int = 5) -> str:
+def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048, temperature: float = 0.5, frequency_penalty:float = 0.0, model:str = GPT_SMART_MODEL, max_calls:int = 5) -> str:
     """
     Chained implementation of the llm api call for long outputs. Iteratively feeds output of an llm api call back into the model until the output is complete.  
     """
@@ -207,10 +211,6 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048
     responses, finishes = [],[] 
     finish = None 
     num_calls = 0 
-    
-    # #use smart model if we exceed a certain context length. Assume 4 chars is about 1 token. 
-    # current_context_chars = len(prompt)
-    # max_fast_model_context = 4 * 10000
 
     while finish != 'stop' and num_calls < max_calls: 
         num_calls += 1 
@@ -236,29 +236,96 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048
     output = "".join(responses)
     return output 
 
+def anthropic_api_call(prompt: str,anthropic_key:str,  max_tokens: int = 2048, temperature: float = 0.5, model:str = CLAUDE_MED_MODEL, max_calls:int = 5) -> str: 
+    """
+    Makes an API call to Anthropics' Large Language Models (LLMs) to generate text based on a provided prompt.
+
+    Parameters:
+    - prompt (str): Text prompt to guide the model's response.
+    - anthropic_key (str): API key for authentication with the OpenAI API.
+    - max_tokens (int, optional): Maximum number of tokens to generate (default is 2048).
+    - temperature (float, optional): Controls randomness in output; lower values are more deterministic (default is 0.5).
+    - model (str, optional): Specifies the model to use (default is 'CLAUDE_MED_MODEL').
+    - max_calls (int, optional): Maximum API call attempts for errors or retries (default is 5).
+
+    Returns:
+    - str: The generated text from the LLM based on the input prompt and parameters.
+
+    Raises:
+    - NotImplementedError: Function is a prototype and awaits implementation.
+    """
+    
+    # create client without env 
+    client = anthropic.Anthropic(
+        api_key=anthropic_key,    
+    )
+
+    # open generic system prompt for document processing 
+    with open(prompts_path/"system_starter_prompt.txt",'r') as file:
+        system_prompt = file.read() 
+    combined_prompt = [{"role": "user", "content": prompt}]   
+
+    # track stop reasons and max calls 
+    responses, stop_reasons = [],[] 
+    stop_reason = None 
+    num_calls = 0 
+
+    while stop_reason != "end_turn" and num_calls < max_calls: 
+        num_calls += 1 
+        print(f"Calling {model}...")
+        message = client.messages.create(
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            system=system_prompt,
+            messages=combined_prompt
+        )
+        print(f"Got resopnse! Call #:{num_calls}")
+        print(message.content)
+        string_response = message.content[0].text
+        print(f"Response Length: {len(string_response)} chars")
+        responses.append(string_response) 
+        stop_reason = message.stop_reason
+        stop_reasons.append(stop_reason)
+        print(f"End reason: {stop_reason}")
+        new_message = {'role': 'assistant', 
+                       'content': string_response}
+        # abide by API rules and only allow alternating between "user" and "assistant"
+        prev_role = combined_prompt[-1]["role"]
+        if prev_role == "user": 
+            combined_prompt.append(new_message)
+        if prev_role == "assistant":
+            combined_prompt[-1]["content"] += string_response
+        cumulative_length = len(combined_prompt[-1]["content"])
+        print(f"Cumulative Response Length: {cumulative_length}")
+
+    output = "".join(responses)
+    return output 
+
+
 # based on the csv bool indicating if the book has a description, either find the word for word description within the docuent or return an empty string. 
-def find_description(in_document:str, document:str, title:str, openai_api_key:str) -> str: 
+def find_description(in_document:str, document:str, title:str, anthropic_key:str) -> str: 
     if int(in_document) != 1: 
         return '' 
     extra_line = f"Text title: {title}\nBook List:\n"
     with open(prompts_path/'find_description.txt', 'r') as file:
         desc_prompt = file.read() 
     full_prompt = desc_prompt + extra_line + document
-    output = llm_api_call(full_prompt, openai_api_key, model=FAST_MODEL)
+    output = anthropic_api_call(full_prompt, anthropic_key, model=FAST_MODEL)
     #optionally try multiple times 
     return output 
     
 
-def sample_book(openai_api_key:str) -> Book:
+def sample_book(anthropic_key:str) -> Book:
     """
     Returns a sample Book object with non-emoji parameters autofilled 
     """ 
     book = Book("Crime and Punishment")
-    book.llm_autofill(openai_api_key) 
+    book.llm_autofill(anthropic_key) 
     book.recs.append("Johnny")
     return book 
 
-def sample_booklist(openai_api_key:str) -> List: 
+def sample_booklist(anthropic_key:str) -> List: 
     """
     Returns a sample booklist, a python List of Book objects with their non-emoji parameters autofilled 
     """
@@ -269,7 +336,7 @@ def sample_booklist(openai_api_key:str) -> List:
                 Book("Never Finished")
                 ] 
     for book in booklist:
-        book.llm_autofill(openai_api_key)
+        book.llm_autofill(anthropic_key)
     return booklist 
 
 def _extract_titles(path_to_folder: str) -> List[str]:
