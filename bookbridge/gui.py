@@ -1,7 +1,9 @@
 import sys
 from bookbridge.utils import *
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QFileDialog, QLabel, QMessageBox, QTextEdit
+# from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QFileDialog, QLabel, QMessageBox, QTextEdit
+from PyQt5.QtWidgets import * 
 from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtGui import QIcon
 
 class MyApp(QWidget):
     def __init__(self):  
