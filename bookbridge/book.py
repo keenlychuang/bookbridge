@@ -118,7 +118,7 @@ class Book:
             with open(prompts_path/'infer_author.txt', 'r') as file:
                 author_prompt = file.read() 
             prompt = author_prompt + f"\n\n{self.title}"
-            author_string = llm_api_call(prompt=prompt, llm_key=llm_key, model=GPT_MULTI_MODEL)
+            author_string = llm_api_call(prompt=prompt, llm_key=llm_key, model=GPT_FAST_MODEL)
             self.author = author_string 
         #fill genre 
         if self.genre is None: 
@@ -136,7 +136,7 @@ class Book:
             with open(prompts_path/'infer_blurb.txt', 'r') as file:
                 blurb_prompt = file.read() 
             prompt = blurb_prompt + f"\n\n{self.title}"
-            blurb_string =llm_api_call(prompt=prompt, llm_key= llm_key, model=GPT_MULTI_MODEL)
+            blurb_string =llm_api_call(prompt=prompt, llm_key= llm_key, model=GPT_FAST_MODEL)
             self.blurb = blurb_string
     
     def update_rating_selection(self) -> None: 

@@ -149,7 +149,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
             text += page.get_text()
     return text
 
-def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page: str, llm_key:str): 
+def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page: str, llm_key:str, emoji:bool=True): 
     """ 
     Given a list of Books, creates a Notion Database with entries corresponding to each book.
 
@@ -167,7 +167,7 @@ def python_to_notion_database(notion_key: str, booklist: List[Book], parent_page
     database_id = search_notion_id(url)
     # for each book in booklist, add page 
     for book in tqdm(booklist, "Converting to Notion"):
-        page_id = add_booklist_page(book, database_id, notion_key=notion_key, llm_key= llm_key)
+        page_id = add_booklist_page(book, database_id, notion_key=notion_key, llm_key= llm_key, emoji=emoji)
     return url
  
 
@@ -399,7 +399,7 @@ def create_booklist_database(parent_page: str, notion_key:str) -> str:
     #return url
     return response['url']
 
-def add_booklist_page(book: Book, database_id: str, notion_key: str, llm_key:str) -> str: 
+def add_booklist_page(book: Book, database_id: str, notion_key: str, llm_key:str, emoji:bool=True) -> str: 
     """
     Adds a row to the database representing the booklist in Notion, cooresponding to the supplied Book. 
 
@@ -413,7 +413,7 @@ def add_booklist_page(book: Book, database_id: str, notion_key: str, llm_key:str
     # create client 
     notion = Client(auth=notion_key)
     parent= {"database_id":database_id}
-    icon = infer_emoji(book, llm_key)
+    icon = infer_emoji(book, llm_key) if emoji else "📚"
     status_name = str(book.status)
 
     properties = {
@@ -532,7 +532,7 @@ def extract_emojis(text:str) -> dict:
 
     return matches 
 
-def pdf_to_notion(path:str, parent_page:str, notion_key:str, llm_key:str) -> str: 
+def pdf_to_notion(path:str, parent_page:str, notion_key:str, llm_key:str,emoji:bool=True) -> str: 
     """
     Given the str path to a pdf containing a booklist, attempt to convert the booklist to a new notion database and return the database id. 
 
@@ -549,5 +549,5 @@ def pdf_to_notion(path:str, parent_page:str, notion_key:str, llm_key:str) -> str
     booklist = pdf_to_booklist(path, llm_key)
     # python list to notion 
     print("Creating a Notion page for you...")
-    url = python_to_notion_database(notion_key, booklist, parent_page, llm_key)
+    url = python_to_notion_database(notion_key, booklist, parent_page, llm_key, emoji=emoji)
     return url

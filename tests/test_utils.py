@@ -141,62 +141,62 @@ def test_pdf_to_bookslist():
     assert len(books) == 5
 
 @pytest.mark.integration
-def test_pdf_to_notion_base():
+def test_pdf_to_notion_base(emoji=False):
     # sample path to pdf, notion key, and parent page 
     path = "data/test/synthetic_booklists/test_booklist_5.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     llm_key = os.getenv("OPENAI_API_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key, emoji=emoji)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.integration
-def test_pdf_to_notion_organic():
+def test_pdf_to_notion_organic(emoji=False):
     # sample path to pdf, notion key, and parent page 
     path = "data/user/booklists/booklist_original.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     llm_key = os.getenv("OPENAI_API_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key, emoji=emoji)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.integration
 @pytest.mark.recs 
-def test_pdf_to_notion_recs_5(): 
+def test_pdf_to_notion_recs_5(emoji=False): 
     # sample path to pdf, notion key, and parent page 
     path = "data/test/synthetic_booklists/recs_5.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     llm_key = os.getenv("OPENAI_API_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key,emoji=emoji)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.integration 
-def test_pdf_to_notion_10(): 
+def test_pdf_to_notion_10(emoji=False): 
     # sample path to pdf, notion key, and parent page 
     path = "data/test/synthetic_booklists/test_booklist_10.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     llm_key = os.getenv("OPENAI_API_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key, emoji=emoji)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.integration 
-def test_pdf_to_notion_25(): 
+def test_pdf_to_notion_25(emoji=False): 
     path = "data/test/synthetic_booklists/test_booklist_25.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     llm_key = os.getenv("OPENAI_API_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key, emoji=emoji)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -210,46 +210,46 @@ def test_force_csv_fix():
     assert is_valid_csv(formatted)
 
 @pytest.mark.extended
-def test_pdf_to_notion_15rs():
+def test_pdf_to_notion_15rs(emoji=False):
     path = "data/test/synthetic_booklists/test_booklist_15rs.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     llm_key = os.getenv("OPENAI_API_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key, emoji=emoji)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.extended
-def test_pdf_to_notion_50rs():
+def test_pdf_to_notion_50rs(emoji=False):
     path = "data/test/synthetic_booklists/test_booklist_50rs.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     llm_key = os.getenv("OPENAI_API_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key, emoji=emoji)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.extended
-def test_pdf_to_notion_99rs():
+def test_pdf_to_notion_99rs(emoji=False):
     path = "data/test/synthetic_booklists/test_booklist_99rs.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     llm_key = os.getenv("OPENAI_API_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key, emoji=emoji)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.extended
-def test_pdf_to_notion_150rs():
+def test_pdf_to_notion_150rs(emoji=False):
     path = "data/test/synthetic_booklists/test_booklist_150rs.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     llm_key = os.getenv("OPENAI_API_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key, emoji=emoji)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
     
@@ -257,46 +257,46 @@ def test_pdf_to_notion_150rs():
 
 
 @pytest.mark.extended 
-def test_pdf_to_notion_40(): 
+def test_pdf_to_notion_40(emoji=False): 
     path = "data/test/synthetic_booklists/test_booklist_40.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     llm_key = os.getenv("OPENAI_API_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key, emoji=emoji)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.extended 
-def test_pdf_to_notion_59():
+def test_pdf_to_notion_59(emoji=False):
     path = "data/test/synthetic_booklists/test_booklist_59.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     llm_key = os.getenv("OPENAI_API_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key, emoji=emoji)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.extended
-def test_pdf_to_notion_30d(): 
+def test_pdf_to_notion_30d(emoji=False): 
     path = "data/test/synthetic_booklists/test_booklist_30d.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     llm_key = os.getenv("OPENAI_API_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key, emoji=emoji)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.extended
-def test_pdf_to_notion_72d():
+def test_pdf_to_notion_72d(emoji=False):
     path = "data/test/synthetic_booklists/test_booklist_72d.pdf"
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
     llm_key = os.getenv("OPENAI_API_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key, emoji=emoji)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
