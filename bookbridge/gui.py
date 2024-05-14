@@ -21,10 +21,10 @@ class MyApp(QWidget):
         self.notionIDLineEdit.setPlaceholderText('Enter Notion Key')
         layout.addWidget(self.notionIDLineEdit)
 
-        # OpenAI API Key 
-        self.openaiLineEdit = QLineEdit(self)
-        self.openaiLineEdit.setPlaceholderText('Enter OpenAI Key')
-        layout.addWidget(self.openaiLineEdit)
+        # anthropic API Key 
+        self.anthropicLineEdit = QLineEdit(self)
+        self.anthropicLineEdit.setPlaceholderText('Enter anthropic Key')
+        layout.addWidget(self.anthropicLineEdit)
 
         # Select File 
         self.filePathLabel = QLabel('No PDF file selected', self)
@@ -45,7 +45,7 @@ class MyApp(QWidget):
 
     # checks if all fields are filled before running the booklist conversion 
     def allFieldsFilled(self):
-        return all([self.urlLineEdit.text(), self.notionIDLineEdit.text(), self.openaiLineEdit.text(), self.filePathLabel.text() != 'No PDF file selected'])
+        return all([self.urlLineEdit.text(), self.notionIDLineEdit.text(), self.anthropicLineEdit.text(), self.filePathLabel.text() != 'No PDF file selected'])
 
     # GUI file select
     def openFileNameDialog(self):
@@ -60,8 +60,8 @@ class MyApp(QWidget):
             parent_page = self.urlLineEdit.text() 
             notion_key = self.notionIDLineEdit.text() 
             doc_path = self.filePathLabel.text() 
-            openai_key = self.openaiLineEdit.text() 
+            anthropic_key = self.anthropicLineEdit.text() 
             parent_page_id = search_notion_id(parent_page)
-            pdf_to_notion(doc_path, parent_page_id, notion_key, openai_key)
+            pdf_to_notion(doc_path, parent_page_id, notion_key, anthropic_key)
         else:
             QMessageBox.warning(self, "Incomplete Fields", "Please fill in all fields before running the script.")

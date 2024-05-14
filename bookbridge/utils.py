@@ -65,7 +65,7 @@ def pdf_to_booklist(path:str, anthropic_key:str, max_attempts:int=2):
     print("Restructuring your booklist...")
     attempts = 0 
 
-### Try multiple times 
+    ### Try multiple times 
     while attempts <= max_attempts: 
         attempts +=1 
         csv = bookstring_to_csv(bookstring, anthropic_key)
@@ -524,7 +524,7 @@ def extract_emojis(text:str) -> dict:
     """
     Returns a mapping of valid emojis based on the emojis returned by notion API
     """ 
-    # Define a regex pattern to match emojis encased in double quotes or backticks.
+    # Define a regex pattern to match emojis encased in double quotes or backtick
     # This example uses a wide range of Unicode blocks to match common emojis, but it is not exhaustive.
     emoji_pattern = r'["`]([\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F700-\U0001F77F\U0001F780-\U0001F7FF\U0001F800-\U0001F8FF\U0001F900-\U0001F9FF\U0001FA00-\U0001FA6F\U0001FA70-\U0001FAFF\U00002702-\U000027B0\U000024C2-\U0001F251]+)["`]'
 

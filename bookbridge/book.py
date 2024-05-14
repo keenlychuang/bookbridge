@@ -1,6 +1,7 @@
 import random
 import os
 import anthropic
+import time
 from tqdm import tqdm 
 from typing import Literal, Optional, List
 from dotenv import load_dotenv
@@ -46,6 +47,7 @@ GPT_SMART_MODEL = "gpt-4-turbo"
 GPT_FAST_MODEL = "gpt-3.5-turbo"
 CLAUDE_SMALL_MODEL = "claude-3-haiku-20240307"
 CLAUDE_MED_MODEL = "claude-3-sonnet-20240229"
+CLAUDE_LARGE_MODEL = "claude-3-opus-20240229"
 
 # Enum for possible states of book completion, for readability 
 class BookStatus(Enum):
@@ -122,7 +124,11 @@ class Book:
             with open(prompts_path/'infer_genre.txt', 'r') as file:
                 genre_prompt = file.read() 
             prompt = genre_prompt + f"\n{valid_genres_string}\n\n{self.title}"
-            genre_string = anthropic_api_call(prompt=prompt, anthropic_key= anthropic_key)
+            genre_string = anthropic_api_call(prompt=prompt, anthropic_key= anthropic_key, model=CLAUDE_SMALL_MODEL)
+            # check length 
+            if len(genre_string) > 100: 
+                print("GENRE STRING TOO LONG, SHORTENING...")
+                genre_string = genre_string[:100]
             self.genre = genre_string
         #fill blurb 
         if self.blurb is None: 
@@ -236,7 +242,7 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048
     output = "".join(responses)
     return output 
 
-def anthropic_api_call(prompt: str,anthropic_key:str,  max_tokens: int = 2048, temperature: float = 0.5, model:str = CLAUDE_MED_MODEL, max_calls:int = 5) -> str: 
+def anthropic_api_call(prompt: str,anthropic_key:str,  max_tokens: int = 2048, temperature: float = 0.5, model:str = CLAUDE_SMALL_MODEL, max_calls:int = 5, r_limit:bool=True) -> str: 
     """
     Makes an API call to Anthropics' Large Language Models (LLMs) to generate text based on a provided prompt.
 
@@ -245,7 +251,7 @@ def anthropic_api_call(prompt: str,anthropic_key:str,  max_tokens: int = 2048, t
     - anthropic_key (str): API key for authentication with the OpenAI API.
     - max_tokens (int, optional): Maximum number of tokens to generate (default is 2048).
     - temperature (float, optional): Controls randomness in output; lower values are more deterministic (default is 0.5).
-    - model (str, optional): Specifies the model to use (default is 'CLAUDE_MED_MODEL').
+    - model (str, optional): Specifies the model to use (default is 'CLAUDE_SMALL_MODEL').
     - max_calls (int, optional): Maximum API call attempts for errors or retries (default is 5).
 
     Returns:
@@ -254,7 +260,8 @@ def anthropic_api_call(prompt: str,anthropic_key:str,  max_tokens: int = 2048, t
     Raises:
     - NotImplementedError: Function is a prototype and awaits implementation.
     """
-    
+    if r_limit:
+        time.sleep(5)
     # create client without env 
     client = anthropic.Anthropic(
         api_key=anthropic_key,    
@@ -272,7 +279,7 @@ def anthropic_api_call(prompt: str,anthropic_key:str,  max_tokens: int = 2048, t
 
     while stop_reason != "end_turn" and num_calls < max_calls: 
         num_calls += 1 
-        print(f"Calling {model}...")
+        # print(f"Calling {model}...")
         message = client.messages.create(
             model=model,
             max_tokens=max_tokens,
@@ -280,14 +287,13 @@ def anthropic_api_call(prompt: str,anthropic_key:str,  max_tokens: int = 2048, t
             system=system_prompt,
             messages=combined_prompt
         )
-        print(f"Got resopnse! Call #:{num_calls}")
-        print(message.content)
+        # print(f"Got resopnse! Call #:{num_calls}")
         string_response = message.content[0].text
-        print(f"Response Length: {len(string_response)} chars")
+        # print(f"Response Length: {len(string_response)} chars")
         responses.append(string_response) 
         stop_reason = message.stop_reason
         stop_reasons.append(stop_reason)
-        print(f"End reason: {stop_reason}")
+        # print(f"End reason: {stop_reason}")
         new_message = {'role': 'assistant', 
                        'content': string_response}
         # abide by API rules and only allow alternating between "user" and "assistant"
@@ -297,7 +303,7 @@ def anthropic_api_call(prompt: str,anthropic_key:str,  max_tokens: int = 2048, t
         if prev_role == "assistant":
             combined_prompt[-1]["content"] += string_response
         cumulative_length = len(combined_prompt[-1]["content"])
-        print(f"Cumulative Response Length: {cumulative_length}")
+        # print(f"Cumulative Response Length: {cumulative_length}")
 
     output = "".join(responses)
     return output 
@@ -311,7 +317,7 @@ def find_description(in_document:str, document:str, title:str, anthropic_key:str
     with open(prompts_path/'find_description.txt', 'r') as file:
         desc_prompt = file.read() 
     full_prompt = desc_prompt + extra_line + document
-    output = anthropic_api_call(full_prompt, anthropic_key, model=FAST_MODEL)
+    output = anthropic_api_call(full_prompt, anthropic_key, model=CLAUDE_SMALL_MODEL)
     #optionally try multiple times 
     return output 
     

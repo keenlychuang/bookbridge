@@ -3,8 +3,10 @@ Now, I need to retrieve descriptions for certain books where the initial extract
 
 Based on this information, could you locate and provide the full description of this book as it appears in the document? 
 Please ensure the description is complete and accurately reflects what is contained in the document. Only output the description, without any other commentary. 
+It is CRUCIAL that you only output the description without any other commentary or analysis. We only want to output words from the document. 
 Make sure you output the description word-for-word, or verbatim, exactly as it appears. 
 If the description cannot be found, just output an empty line. 
+
 For example, say you were presented with the following document: 
 
 Ishmael:"Ishmael" is a philosophical novel by Daniel Quinn that explores the idea of civilization and humanity's place in the world through a series of dialogues between a man and a telepathic gorilla.
