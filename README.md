@@ -85,7 +85,7 @@ By following these steps, users will set up a virtual environment for the projec
 To use BookBridge to import your booklist into a Notion database, follow these steps:
 
 1. Obtain an integration token from Notion by creating a new integration. Make sure your Notion page has given access to the integration. 
-2. Obtain an API key from OpenAI to use LLMs. This iteration uses `gpt-3.5-turbo`. 
+2. Obtain an API key from OpenAI to use LLMs. This iteration uses `gpt-4o`. 
 3. Obtain the URL of the Notion page you want to import the booklist into. If you're new to Notion, the [getting started](https://www.notion.so/help/category/new-to-notion) page is a good place to begin.
 4. Run the tool using the command:
    ```
