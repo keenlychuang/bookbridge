@@ -28,7 +28,7 @@ def bookstring_to_csv(bookstring:str, llm_key:str)-> str:
     with open(prompts_path / 'booklist_to_csv.txt', 'r') as file: 
         processing_prompt = file.read() 
     prompt_full = processing_prompt + bookstring
-    csv_formatted = anthropic_api_call(prompt_full, llm_key)
+    csv_formatted = llm_api_call(prompt_full, llm_key)
     print("Reformatted booklist...")
     return csv_formatted
 
@@ -202,9 +202,9 @@ def infer_emoji(book: Book, llm_key:str) -> str:
             if attempts > 0: 
                 exclude_text = f'Do not use the following emojis:{previous_emojis}\n'
                 new_prompt = full_prompt + exclude_text
-                response_text = clean_up_emoji(anthropic_api_call(new_prompt, llm_key))
+                response_text = clean_up_emoji(llm_api_call(new_prompt, llm_key))
             else: 
-                response_text = clean_up_emoji(anthropic_api_call(full_prompt, llm_key))
+                response_text = clean_up_emoji(llm_api_call(full_prompt, llm_key))
             # Quality check
             if valid_emoji(response_text):
                 return response_text

@@ -53,8 +53,8 @@ def test_update_rating_selection():
 def test_book_autofill(): 
     book = Book("Crime and Punishment")
     expected_author = "Fyodor Dostoevsky"
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    book.llm_autofill(anthropic_key) 
+    llm_key = os.getenv("OPENAI_API_KEY")
+    book.llm_autofill(llm_key) 
     assert book.author == expected_author
     assert book.genre in valid_genres
     assert isinstance(book.blurb, str)
@@ -99,8 +99,8 @@ def test_llm_api_call_chained():
 def test_parse_csv_response():
     with open('data/test/synthetic_booklists/sample.csv', 'r') as file:
         output = file.read()
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    books = parse_csv_response(output, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    books = parse_csv_response(output, llm_key)
     print(books)
     for book in books:
         assert isinstance(book, Book), "failed csv parse, not all books in the booklist are books"
@@ -109,8 +109,8 @@ def test_parse_csv_response():
 def test_parse_csv_recs_response():
     with open('data/test/synthetic_booklists/sample_with_recs.csv', 'r') as file:
         output = file.read()
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    books = parse_csv_response(output, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    books = parse_csv_response(output, llm_key)
     print(books)
     for book in books:
         assert isinstance(book, Book), "failed csv parse, not all books in the booklist are books"
@@ -120,8 +120,8 @@ def test_parse_csv_recs_response():
 def test_bookstring_to_csv(): 
     with open("data/test/synthetic_booklists/sample_booklist_20.txt", 'r') as file: 
         string = file.read() 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    csv = bookstring_to_csv(string, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    csv = bookstring_to_csv(string, llm_key)
     print(csv)
     assert is_valid_csv(csv)
 
@@ -136,8 +136,8 @@ def test_extract_text_from_pdf():
 @pytest.mark.doc
 def test_pdf_to_bookslist():
     path = "data/test/synthetic_booklists/test_booklist_5.pdf"
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    books = pdf_to_booklist(path, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    books = pdf_to_booklist(path, llm_key)
     assert len(books) == 5
 
 @pytest.mark.integration
@@ -147,8 +147,20 @@ def test_pdf_to_notion_base():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
+    # go check that the page actually contains a good booklist 
+    print(f"Go Check Out Your New Page: {url}")
+
+@pytest.mark.integration
+def test_pdf_to_notion_organic():
+    # sample path to pdf, notion key, and parent page 
+    path = "data/user/booklists/booklist_original.pdf"
+    notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
+    test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
+    # function call 
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -160,8 +172,8 @@ def test_pdf_to_notion_recs_5():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -172,8 +184,8 @@ def test_pdf_to_notion_10():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -183,8 +195,8 @@ def test_pdf_to_notion_25():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -203,8 +215,8 @@ def test_pdf_to_notion_15rs():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -214,8 +226,8 @@ def test_pdf_to_notion_50rs():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -225,8 +237,8 @@ def test_pdf_to_notion_99rs():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -236,8 +248,8 @@ def test_pdf_to_notion_150rs():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
     
@@ -250,8 +262,8 @@ def test_pdf_to_notion_40():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -261,8 +273,8 @@ def test_pdf_to_notion_59():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -272,8 +284,8 @@ def test_pdf_to_notion_30d():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
@@ -283,16 +295,16 @@ def test_pdf_to_notion_72d():
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     test_parent_page_id = os.getenv('PARENT_TEST_PAGE')
     # function call 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    url = pdf_to_notion(path, test_parent_page_id, notion_key, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = pdf_to_notion(path, test_parent_page_id, notion_key, llm_key)
     # go check that the page actually contains a good booklist 
     print(f"Go Check Out Your New Page: {url}")
 
 @pytest.mark.doc
 def test_autofill():
     book = Book("Animal Farm")
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    book.llm_autofill(anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    book.llm_autofill(llm_key)
 
     # assert proper formatting on first three fields 
     assert book.title == "Animal Farm"
@@ -312,15 +324,15 @@ def test_pretty_print():
 @pytest.mark.notion 
 def test_python_to_notion_database(): 
     # load example python booklist 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    booklist = sample_booklist(anthropic_key) 
+    llm_key = os.getenv("OPENAI_API_KEY")
+    booklist = sample_booklist(llm_key) 
     notion_key = os.getenv("TEST_NOTION_SECRET_KEY")
     parent_page = os.getenv("PARENT_TEST_PAGE")
     #load up notion client 
     notion = Client(auth=os.getenv('TEST_NOTION_SECRET_KEY'))
     # create database and return id 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    url = python_to_notion_database(notion_key, booklist, parent_page, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    url = python_to_notion_database(notion_key, booklist, parent_page, llm_key)
     id = search_notion_id(url)
     # print out pages 
     query_response = notion.databases.query(
@@ -331,11 +343,11 @@ def test_python_to_notion_database():
 @pytest.mark.notion 
 def test_infer_emoji(): 
     # load example book 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    book = sample_book(anthropic_key) 
+    llm_key = os.getenv("OPENAI_API_KEY")
+    book = sample_book(llm_key) 
     # infer emoji 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    emoji = infer_emoji(book, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    emoji = infer_emoji(book, llm_key)
     # assert emoji is acceptable by notion, ie, unicode 
     assert valid_emoji(emoji)
 
@@ -355,8 +367,8 @@ def test_create_booklist_database():
 
 @pytest.mark.notion 
 def test_add_booklist_page(): 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    book = sample_book(anthropic_key) 
+    llm_key = os.getenv("OPENAI_API_KEY")
+    book = sample_book(llm_key) 
     key = os.getenv('TEST_NOTION_SECRET_KEY')
     notion = Client(auth=key)
     # assume we have a valid booklist database ID already with properly formatted properties 
@@ -367,8 +379,8 @@ def test_add_booklist_page():
     )
     prev_len = len(query_response['results'])
     # add page 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    add_booklist_page(book, test_db_id, key, anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    add_booklist_page(book, test_db_id, key, llm_key)
     # check number of pages after, assert we added a page 
     query_response = notion.databases.query(
         database_id=os.getenv('TEST_DB_ID')
@@ -377,8 +389,8 @@ def test_add_booklist_page():
 
 @pytest.mark.notion 
 def test_add_booklist_page_new_select(): 
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    book = sample_book(anthropic_key) 
+    llm_key = os.getenv("OPENAI_API_KEY")
+    book = sample_book(llm_key) 
     key = os.getenv('TEST_NOTION_SECRET_KEY')
     notion = Client(auth=key)
     # assume we have a valid booklist database ID already with properly formatted properties 
@@ -390,8 +402,8 @@ def test_add_booklist_page_new_select():
     prev_len = len(query_response['results'])
     # add page 
     book.genre = "new-genre"
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    add_booklist_page(book, test_db_id, key,anthropic_key)
+    llm_key = os.getenv("OPENAI_API_KEY")
+    add_booklist_page(book, test_db_id, key,llm_key)
     # check number of pages after, assert we added a page 
     query_response = notion.databases.query(
         database_id=os.getenv('TEST_DB_ID')
@@ -401,16 +413,16 @@ def test_add_booklist_page_new_select():
 @pytest.mark.doc
 def test_sample_book(): 
     # call function
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    book = sample_book(anthropic_key) 
+    llm_key = os.getenv("OPENAI_API_KEY")
+    book = sample_book(llm_key) 
     # check if its a proper book object 
     assert isinstance(book, Book)
 
 @pytest.mark.doc
 def test_sample_booklist(): 
     # call function
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
-    booklist = sample_booklist(anthropic_key) 
+    llm_key = os.getenv("OPENAI_API_KEY")
+    booklist = sample_booklist(llm_key) 
     # check if each book was autofilled, and each book is indeed a Book 
     for book in booklist: 
         assert book.author is not None
@@ -459,9 +471,9 @@ def test_search_notion_id_with_incomplete_url():
 def test_find_description_short():
     path = "data/test/synthetic_booklists/test_booklist_15rs.pdf"
     bookstring = extract_text_from_pdf(path)
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
+    llm_key = os.getenv("OPENAI_API_KEY")
     title = "Anna Karenina"
-    desc = find_description("1", bookstring, title, anthropic_key)
+    desc = find_description("1", bookstring, title, llm_key)
     target = "\"Anna Karenina\" by Leo Tolstoy follows the tragic story of Anna, a married woman who embarks on a passionate affair with Count Vronsky, leading to societal judgment and personal turmoil. The novel explores themes of love, society, and morality in 19th-century Russia."
     print(desc)
     print(target)
@@ -471,9 +483,9 @@ def test_find_description_short():
 def test_find_description_long():
     path =  "data/test/synthetic_booklists/test_booklist_99rs.pdf"
     bookstring=extract_text_from_pdf(path)
-    anthropic_key = os.getenv("ANTHROPIC_KEY")
+    llm_key = os.getenv("OPENAI_API_KEY")
     title = "Adventures of Huckleberry Finn"
-    desc = find_description("1", bookstring, title, anthropic_key)
+    desc = find_description("1", bookstring, title, llm_key)
     target = "\"The Adventures of Huckleberry Finn\" follows the journey of a young boy named Huck Finn as he escapes his abusive father and embarks on a rafting adventure down the Mississippi River with a runaway slave named Jim. Along the way, they encounter various characters and face moral dilemmas, ultimately exploring themes of race, freedom, and the importance of individual conscience."
     print(desc)
     print(target)
