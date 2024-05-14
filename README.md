@@ -19,7 +19,7 @@ As an avid reader, I've accumulated a substantial list of books over the years, 
 Original booklist in PDF format prior to using the Booklist Import Tool, lacking Notion's interactive features.
 
 <div align="center">
-    <img src="./assets/screenshots/before.png" alt="Booklist in PDF format" title="Booklist Before Import" style="width: 40%; height: auto;"/>
+    <img src="./assets/screenshots/before.png" alt="Booklist in PDF format" title="Booklist Before Import" style="width: 60%; height: auto;"/>
 </div>
 
 ### After Import to Notion
@@ -27,7 +27,7 @@ Original booklist in PDF format prior to using the Booklist Import Tool, lacking
 Transformed into a dynamic Notion database, offering categorization, tagging, and reading status updates for a richer reading management experience.
 
 <div align="center">
-    <img src="./assets/screenshots/notion.png" alt="Booklist in Notion" title="Booklist After Import to Notion" style="width: 50%; height: auto;"/>
+    <img src="./assets/screenshots/notion.png" alt="Booklist in Notion" title="Booklist After Import to Notion" style="width: 60%; height: auto;"/>
 </div>
 
 
