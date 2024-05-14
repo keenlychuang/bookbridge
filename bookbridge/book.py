@@ -43,6 +43,7 @@ names_list = [
     "Sofia"
 ]
 
+GPT_MULTI_MODEL = "gpt-4o"
 GPT_SMART_MODEL = "gpt-4-turbo"
 GPT_FAST_MODEL = "gpt-3.5-turbo"
 CLAUDE_SMALL_MODEL = "claude-3-haiku-20240307"
@@ -176,7 +177,7 @@ class Book:
         )
 
 
-def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temperature: float = 0.5, frequency_penalty:float = 0.0, model:str = GPT_SMART_MODEL) -> str:
+def llm_api_call(prompt: str, llm_key:str,  max_tokens: int = 4096, temperature: float = 0.5, frequency_penalty:float = 0.0, model:str = GPT_MULTI_MODEL) -> str:
     """
     Calls the openai llm API using a provided text prompt to generate text.
 
@@ -194,7 +195,7 @@ def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temper
     """
     load_dotenv() 
     client = OpenAI() 
-    client.api_key = openai_api_key 
+    client.api_key = llm_key 
     gpt_role_prompt = "You are an AI assistant that can help with a variety of tasks."  
     gpt_user_prompt = prompt
     combined_prompt=[{"role": "system", "content": gpt_role_prompt}, {"role": "user", "content": gpt_user_prompt}]
@@ -207,12 +208,12 @@ def llm_api_call(prompt: str,openai_api_key:str,  max_tokens: int = 4096, temper
     string_response = response.choices[0].message.content
     return string_response
 
-def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048, temperature: float = 0.5, frequency_penalty:float = 0.0, model:str = GPT_SMART_MODEL, max_calls:int = 5) -> str:
+def llm_api_call_chained(prompt: str,llm_key:str,  max_tokens: int = 2048, temperature: float = 0.5, frequency_penalty:float = 0.0, model:str = GPT_MULTI_MODEL, max_calls:int = 5) -> str:
     """
     Chained implementation of the llm api call for long outputs. Iteratively feeds output of an llm api call back into the model until the output is complete.  
     """
     client = OpenAI() 
-    client.api_key = openai_api_key
+    client.api_key = llm_key
     combined_prompt = [{'role':'system', 'content':prompt}]
     responses, finishes = [],[] 
     finish = None 
@@ -242,7 +243,7 @@ def llm_api_call_chained(prompt: str,openai_api_key:str,  max_tokens: int = 2048
     output = "".join(responses)
     return output 
 
-def anthropic_api_call(prompt: str,anthropic_key:str,  max_tokens: int = 2048, temperature: float = 0.5, model:str = CLAUDE_SMALL_MODEL, max_calls:int = 5, r_limit:bool=True) -> str: 
+def anthropic_api_call(prompt: str,anthropic_key:str,  max_tokens: int = 2048, temperature: float = 0.5, model:str = CLAUDE_MED_MODEL, max_calls:int = 5, r_limit:bool=True) -> str: 
     """
     Makes an API call to Anthropics' Large Language Models (LLMs) to generate text based on a provided prompt.
 
