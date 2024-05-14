@@ -25,7 +25,7 @@ class MyApp(QWidget):
 
         # anthropic API Key 
         self.anthropicLineEdit = QLineEdit(self)
-        self.anthropicLineEdit.setPlaceholderText('Enter anthropic Key')
+        self.anthropicLineEdit.setPlaceholderText('Enter LLM API Key')
         layout.addWidget(self.anthropicLineEdit)
 
         # Select File 
@@ -62,8 +62,8 @@ class MyApp(QWidget):
             parent_page = self.urlLineEdit.text() 
             notion_key = self.notionIDLineEdit.text() 
             doc_path = self.filePathLabel.text() 
-            anthropic_key = self.anthropicLineEdit.text() 
+            llm_key = self.anthropicLineEdit.text() 
             parent_page_id = search_notion_id(parent_page)
-            pdf_to_notion(doc_path, parent_page_id, notion_key, anthropic_key)
+            pdf_to_notion(doc_path, parent_page_id, notion_key, llm_key)
         else:
             QMessageBox.warning(self, "Incomplete Fields", "Please fill in all fields before running the script.")

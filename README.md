@@ -12,6 +12,25 @@ Transform your old booklists into a dynamic Notion database with the Booklist Im
 
 As an avid reader, I've accumulated a substantial list of books over the years, categorizing them by what I wanted to read, what I had completed, and the type of books they are. With an intention to share my reading journey more publicly and to organize my collection with greater sophistication, I've chosen Notion as the platform for its unparalleled ability to present, store, and share information. On top of being a pleasure to look at, Notion pages are easy to share, publish, modify, and update, and has robust API support for people with more technical inclination. Not sponsored, btw. 
 
+## Screenshots
+
+### Before Import
+
+Original booklist in PDF format prior to using the Booklist Import Tool, lacking Notion's interactive features.
+
+<div align="center">
+    <img src="./assets/screenshots/before.png" alt="Booklist in PDF format" title="Booklist Before Import" style="width: 40%; height: auto;"/>
+</div>
+
+### After Import to Notion
+
+Transformed into a dynamic Notion database, offering categorization, tagging, and reading status updates for a richer reading management experience.
+
+<div align="center">
+    <img src="./assets/screenshots/notion.png" alt="Booklist in Notion" title="Booklist After Import to Notion" style="width: 50%; height: auto;"/>
+</div>
+
+
 ## Installation
 
 To get started with BookBridge, follow these simple installation instructions.
@@ -85,7 +104,7 @@ By following these steps, users will set up a virtual environment for the projec
 To use BookBridge to import your booklist into a Notion database, follow these steps:
 
 1. Obtain an integration token from Notion by creating a new integration. Make sure your Notion page has given access to the integration. 
-2. Obtain an API key from OpenAI to use LLMs. This iteration uses `gpt-3.5-turbo`. 
+2. Obtain an API key from OpenAI to use LLMs. This iteration uses `gpt-4o`. 
 3. Obtain the URL of the Notion page you want to import the booklist into. If you're new to Notion, the [getting started](https://www.notion.so/help/category/new-to-notion) page is a good place to begin.
 4. Run the tool using the command:
    ```
